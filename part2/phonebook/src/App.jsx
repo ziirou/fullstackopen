@@ -16,7 +16,10 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     if (!newName) {
-      console.log('empty name, not added')
+      alert(`Person with empty name can't be added to phonebook.`)
+      return
+    } else if (persons.find(person => person.name === newName)) {
+      alert(`${newName} is already added to phonebook.`)
       return
     }
 
