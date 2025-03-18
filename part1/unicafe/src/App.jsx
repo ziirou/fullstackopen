@@ -2,10 +2,20 @@ import { useState } from 'react'
 
 const StatisticLine = ({ text, value }) => {
   if (text === 'positive') {
-    return <div>{text}: {value} %</div>
+    return (
+      <tr>
+        <td>{text}:</td>
+        <td>{value} %</td>
+      </tr>
+    )
   }
 
-  return <div>{text}: {value}</div>
+  return (
+    <tr>
+      <td>{text}:</td>
+      <td>{value}</td>
+    </tr>
+  )
 }
 
 const Button = (props) => (
@@ -24,14 +34,16 @@ const Statistics = ({ good, neutral, bad }) => {
   let positive = (good / total) * 100 || 0
 
   return (
-    <div>
-      <StatisticLine text={'good'} value={good} />
-      <StatisticLine text={'neutral'} value={neutral} />
-      <StatisticLine text={'bad'} value={bad} />
-      <StatisticLine text={'all'} value={total} />
-      <StatisticLine text={'average'} value={average} />
-      <StatisticLine text={'positive'} value={positive} />
-    </div>
+    <table>
+      <tbody>
+        <StatisticLine text={'good'} value={good} />
+        <StatisticLine text={'neutral'} value={neutral} />
+        <StatisticLine text={'bad'} value={bad} />
+        <StatisticLine text={'all'} value={total} />
+        <StatisticLine text={'average'} value={average} />
+        <StatisticLine text={'positive'} value={positive} />
+      </tbody>
+    </table>
   )
 }
 
