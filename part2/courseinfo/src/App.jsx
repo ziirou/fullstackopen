@@ -10,15 +10,13 @@ const Part = ({ name, exercises }) => {
 
 const Total = ({ parts }) => {
   console.log('Total - parts:', parts);
-  const exercises = parts.map(part => part.exercises);
-  console.log('Total - exercises:', exercises);
-  let total_exercises = 0;
-  exercises.forEach((value) => {
-    console.log('Total - forEach:', total_exercises, '+', value);
-    total_exercises += value;
-  });
-  console.log('Total - total_exercises:', total_exercises);
-  return <p><b>total of {total_exercises} exercises</b></p>
+  const total = parts.reduce((total_exercises, part) => {
+    console.log('Total - total:', total_exercises,
+                '- adding exercises from part:', part)
+    return total_exercises + part.exercises
+  }, 0) // 0 is the initial value
+  console.log('Total - total:', total);
+  return <p><b>total of {total} exercises</b></p>
 }
 
 const Content = ({ parts }) => {
