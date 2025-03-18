@@ -1,39 +1,56 @@
 import { useState } from 'react'
 
 const Person = ( {person} ) => {
-  console.log('Person - person:', person)
+  //console.log('Person - person:', person)
   return (
-    <li>{person.name}</li>
+    <li>{person.name} {person.number}</li>
   )
 }
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
+    {
+      name: 'Arto Hellas',
+      number: '040-1231234',
+    }
   ]) 
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
 
   const addPerson = (event) => {
     event.preventDefault()
     if (!newName) {
-      alert(`Person with empty name can't be added to phonebook.`)
+      alert(`Person with EMPTY NAME can't be added to phonebook.`)
+      return
+    } else if (!newNumber) {
+      alert(`Person with EMPTY NUMBER can't be added to phonebook.`)
       return
     } else if (persons.find(person => person.name === newName)) {
       alert(`${newName} is already added to phonebook.`)
       return
+    } else if (persons.find(person => person.number === newNumber)) {
+      alert(`${newNumber} is already added to phonebook.`)
+      return
     }
 
-    console.log('adding person:', newName)
     const personObject = {
-      name: newName
+      name: newName,
+      number: newNumber
     }
+    console.log('adding person:', personObject)
     setPersons(persons.concat(personObject))
     setNewName('')
+    setNewNumber('')
   }
 
   const handleNewName = (event) => {
-    console.log('new input:', event.target.value)
+    //console.log('new name input:', event.target.value)
     setNewName(event.target.value)
+  }
+
+  const handleNewNumber = (event) => {
+    //console.log('new number input:', event.target.value)
+    setNewNumber(event.target.value)
   }
 
   return (
@@ -45,6 +62,13 @@ const App = () => {
           <input
             value={newName}
             onChange={handleNewName}
+          />
+        </div>
+        <div>
+          number:
+          <input
+            value={newNumber}
+            onChange={handleNewNumber}
           />
         </div>
         <div>
