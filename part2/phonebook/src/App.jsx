@@ -11,37 +11,74 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    console.log('effect')
+    //console.log('effect')
     personService
       .getAll()
       .then(initialPersons => {
-        console.log('promise fulfilled')
+        //console.log('promise fulfilled')
         setPersons(initialPersons)
       })
   }, [])
-  console.log('render', persons.length, 'persons')
+  //console.log('render', persons.length, 'persons')
+
+  const replaceNumber = (id, personObject) => {
+    const updatedPerson = { ...personObject, number: personObject.number }
+
+    console.log('updating person:', personObject)
+    personService
+      .update(id, updatedPerson)
+      .then(returnedPerson => {
+        console.log('updated person:', returnedPerson)
+        setPersons(
+          persons.map(person =>
+            person.id !== id
+            ? person
+            : returnedPerson)
+        )
+      })
+      .catch(error => {
+        console.log(error)
+        alert(`Error updating ${personObject.name} to phonebook.`)
+        setPersons(persons.filter(person => person.name !== personObject.name))
+      })
+      setNewName('')
+      setNewNumber('')
+  }
 
   const addPerson = (event) => {
     event.preventDefault()
-    if (!newName) {
-      alert(`Person with EMPTY NAME can't be added to phonebook.`)
-      return
-    } else if (!newNumber) {
-      alert(`Person with EMPTY NUMBER can't be added to phonebook.`)
-      return
-    } else if (persons.find(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook.`)
-      return
-    } else if (persons.find(person => person.number === newNumber)) {
-      alert(`${newNumber} is already added to phonebook.`)
-      return
-    }
 
     const personObject = {
       name: newName,
       number: newNumber,
     }
-    console.log('adding person:', personObject)
+
+    const matchPerson = persons.find(person => 
+      person.name.toLowerCase() === personObject.name.toLowerCase())
+
+    if (!personObject.name) {
+      alert(`Person with EMPTY NAME can't be added to phonebook.`)
+      return
+    } else if (!personObject.number) {
+      alert(`Person with EMPTY NUMBER can't be added to phonebook.`)
+      return
+    } else if (persons.find(person => person.number === personObject.number)) {
+      alert(`${personObject.number} is already added to phonebook.`)
+      return
+    } else if (matchPerson) {
+      const confirmNewName = confirm(`${personObject.name} is already added to phonebook, ` +
+                                      `replace the old number with a new one?`)
+      if (confirmNewName) {
+        console.log(`replacing number for ${matchPerson.name}`)
+        replaceNumber(matchPerson.id, personObject)
+        return
+      } else {
+        console.log(`you canceled replacing number for ${matchPerson.name}`)
+        return
+      }
+    }
+
+    console.log('adding new person:', personObject)
     personService
       .create(personObject)
       .then(returnedPerson => {
@@ -65,7 +102,10 @@ const App = () => {
       .remove(id)
       .then(returnedPerson => {
         console.log(returnedPerson)
-        persons.map(person => person.id !== id ? person : returnedPerson)
+        persons.map(person =>
+          person.id !== id
+          ? person
+          : returnedPerson)
       })
       .catch(error => {
         console.log(error)
