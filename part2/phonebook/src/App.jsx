@@ -84,13 +84,31 @@ const App = () => {
       person.name.toLowerCase() === personObject.name.toLowerCase())
 
     if (!personObject.name) {
-      alert(`Person with EMPTY NAME can't be added to phonebook.`)
+      setNotification({
+        message: `Person with EMPTY NAME can't be added to phonebook.`,
+        type: 'warning'
+      })
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
       return
     } else if (!personObject.number) {
-      alert(`Person with EMPTY NUMBER can't be added to phonebook.`)
+      setNotification({
+        message: `Person with EMPTY NUMBER can't be added to phonebook.`,
+        type: 'warning'
+      })
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
       return
     } else if (persons.find(person => person.number === personObject.number)) {
-      alert(`${personObject.number} is already added to phonebook.`)
+      setNotification({
+        message: `${personObject.number} is already added to phonebook.`,
+        type: 'warning'
+      })
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
       return
     } else if (matchPerson) {
       const confirmNewName = confirm(`${personObject.name} is already added to phonebook, ` +
