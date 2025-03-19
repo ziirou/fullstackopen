@@ -52,6 +52,28 @@ const App = () => {
       })
   }
 
+  const deletePerson = (id) => {
+    const person = persons.find(p => p.id === id)
+    if (confirm(`Delete ${person.name} from phonebook?`)) {
+      console.log(`deleting person ${person.name}`)
+    } else {
+      console.log(`you canceled deleting ${person.name}`)
+      return
+    }
+
+    personService
+      .remove(id)
+      .then(returnedPerson => {
+        console.log(returnedPerson)
+        persons.map(person => person.id !== id ? person : returnedPerson)
+      })
+      .catch(error => {
+        console.log(error)
+        alert(`Error deleting ${person.name} from phonebook.`)
+      })
+      setPersons(persons.filter(person => person.id !== id))
+  }
+
   const handleNewName = (event) => {
     //console.log('new name input:', event.target.value)
     setNewName(event.target.value)
@@ -89,7 +111,10 @@ const App = () => {
         handleNewNumber={handleNewNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons
+        persons={personsToShow}
+        deletePerson={deletePerson}
+      />
     </div>
   )
 }
