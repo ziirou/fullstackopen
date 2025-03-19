@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Filter from './components/Filter'
+import Notification from './components/Notification'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import personService from './services/persons'
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     //console.log('effect')
@@ -35,11 +37,17 @@ const App = () => {
             ? person
             : returnedPerson)
         )
+
+        setNotification(`Updated number for ${returnedPerson.name}`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       })
       .catch(error => {
         console.log(error)
         alert(`Error updating ${personObject.name} to phonebook.`)
         setPersons(persons.filter(person => person.name !== personObject.name))
+        return
       })
       setNewName('')
       setNewNumber('')
@@ -86,6 +94,11 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+
+        setNotification(`Added ${returnedPerson.name}`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       })
   }
 
@@ -106,6 +119,11 @@ const App = () => {
           person.id !== id
           ? person
           : returnedPerson)
+
+        setNotification(`Deleted ${returnedPerson.name}`)
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       })
       .catch(error => {
         console.log(error)
@@ -138,6 +156,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter
         filter={filter}
         handleNewFilter={handleNewFilter}
