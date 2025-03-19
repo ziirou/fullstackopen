@@ -20,6 +20,17 @@ const App = () => {
         //console.log('promise fulfilled')
         setPersons(initialPersons)
       })
+      .catch(error => {
+        console.log(error)
+
+        setNotification({
+          message: `Error ${error.status} on getting phonebook.`,
+          type: 'error'
+        })
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
+      })
   }, [])
   //console.log('render', persons.length, 'persons')
 
@@ -37,20 +48,28 @@ const App = () => {
             ? person
             : returnedPerson)
         )
+        setNewName('')
+        setNewNumber('')
 
-        setNotification(`Updated number for ${returnedPerson.name}`)
+        setNotification({
+          message: `Updated number for ${returnedPerson.name}`,
+          type: 'notification'
+        })
         setTimeout(() => {
           setNotification(null)
         }, 5000)
       })
       .catch(error => {
         console.log(error)
-        alert(`Error updating ${personObject.name} to phonebook.`)
-        setPersons(persons.filter(person => person.name !== personObject.name))
-        return
+
+        setNotification({
+          message: `Error ${error.status} on updating ${personObject.name} to phonebook.`,
+          type: 'error'
+        })
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       })
-      setNewName('')
-      setNewNumber('')
   }
 
   const addPerson = (event) => {
@@ -95,7 +114,21 @@ const App = () => {
         setNewName('')
         setNewNumber('')
 
-        setNotification(`Added ${returnedPerson.name}`)
+        setNotification({
+          message: `Added ${returnedPerson.name}`,
+          type: 'notification'
+        })
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
+      })
+      .catch(error => {
+        console.log(error)
+
+        setNotification({
+          message: `Error ${error.status} on adding ${personObject.name} to phonebook.`,
+          type: 'error'
+        })
         setTimeout(() => {
           setNotification(null)
         }, 5000)
@@ -120,15 +153,26 @@ const App = () => {
           ? person
           : returnedPerson)
 
-        setNotification(`Deleted ${returnedPerson.name}`)
+        setNotification({
+          message: `Deleted ${returnedPerson.name}`,
+          type: 'notification'
+        })
         setTimeout(() => {
           setNotification(null)
         }, 5000)
       })
       .catch(error => {
         console.log(error)
-        alert(`Error deleting ${person.name} from phonebook.`)
+
+        setNotification({
+          message: `Error ${error.status} on deleting ${person.name} from phonebook.`,
+          type: 'error'
+        })
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       })
+
       setPersons(persons.filter(person => person.id !== id))
   }
 
@@ -156,7 +200,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={notification} />
+      <Notification notification={notification} />
       <Filter
         filter={filter}
         handleNewFilter={handleNewFilter}
