@@ -4,7 +4,7 @@ import Filter from './components/Filter'
 import Countries from './components/Countries'
 
 const App = () => {
-  const [countries, setCountries] = useState(null)
+  const [countries, setCountries] = useState([])
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
@@ -24,6 +24,10 @@ const App = () => {
   const handleNewFilter = (event) => {
     //console.log('new filter input:', event.target.value)
     setFilter(event.target.value)
+  }
+
+  if (!countries || countries.length === 0) {
+    return null
   }
 
   return (

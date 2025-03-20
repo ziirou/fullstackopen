@@ -3,10 +3,6 @@ import Country from './Country'
 import CountryInfo from './CountryInfo'
 
 const Countries = ( {countries, filter} ) => {
-  if (!countries) {
-    return
-  }
-
   //console.log('Countries - countries:', countries)
 
   const [selectedCountry, setSelectedCountry] = useState(null)
@@ -27,6 +23,8 @@ const Countries = ( {countries, filter} ) => {
     return <p>Too many matches, specify another filter</p>
   } else if (countriesToShow.length === 1) {
     return <CountryInfo country={countriesToShow[0]} />
+  } else if (countriesToShow.length === 0) {
+    return <p>No matches, specify another filter</p>
   }
 
   //console.log('Countries - countriesToShow:', countriesToShow)
