@@ -1,3 +1,5 @@
+import Weather from './Weather'
+
 const CountryInfo = ( {country} ) => {
   //console.log('CountryInfo - country:', country)
 
@@ -16,9 +18,13 @@ const CountryInfo = ( {country} ) => {
           )
         )}
       </ul>
-      <img
+      <img className='flag'
         src={country.flags.png}
         alt={country.name.common}
+      />
+      <Weather
+        capital={country.capital[0]}
+        capitalInfo={country.capitalInfo}
       />
     </div>
   )

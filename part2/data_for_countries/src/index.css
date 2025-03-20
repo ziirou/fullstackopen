@@ -14,7 +14,7 @@ input {
   margin-left: 2px;
 }
 
-img {
+.flag {
   width: 15%;
   height: auto;
   border: 1px solid black;
