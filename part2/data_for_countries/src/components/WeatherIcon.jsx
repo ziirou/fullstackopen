@@ -6,51 +6,49 @@ const WeatherIcon = ({ weatherCode, isDay }) => {
     return <p>Unable to get weather icon.</p>
   }
 
-  const getWeatherIcon = (code, isDay) => {
-    const suffix = isDay ? "d" : "n" // Determine day ("d") or night ("n")
+  const suffix = isDay ? "d" : "n" // Determine day ("d") or night ("n")
 
-    const iconMapping = {
-        0: `01${suffix}`, // Clear sky
-        1: `02${suffix}`, // Mainly clear
-        2: `03${suffix}`, // Partly cloudy
-        3: `04${suffix}`, // Overcast
-        45: `50${suffix}`, // Fog
-        48: `50${suffix}`, // Depositing rime fog
-        51: `09${suffix}`, // Drizzle: Light intensity
-        53: `09${suffix}`, // Drizzle: Moderate intensity
-        55: `09${suffix}`, // Drizzle: Dense intensity
-        56: `13${suffix}`, // Freezing Drizzle: Light intensity
-        57: `13${suffix}`, // Freezing Drizzle: Dense intensity
-        61: `10${suffix}`, // Rain: Slight intensity
-        63: `10${suffix}`, // Rain: Moderate intensity
-        65: `10${suffix}`, // Rain: Heavy intensity
-        66: `13${suffix}`, // Freezing Rain: Light intensity
-        67: `13${suffix}`, // Freezing Rain: Heavy intensity
-        71: `13${suffix}`, // Snow fall: Slight intensity
-        73: `13${suffix}`, // Snow fall: Moderate intensity
-        75: `13${suffix}`, // Snow fall: Heavy intensity
-        77: `13${suffix}`, // Snow grains
-        80: `09${suffix}`, // Rain showers: Slight
-        81: `09${suffix}`, // Rain showers: Moderate
-        82: `09${suffix}`, // Rain showers: Violent
-        85: `13${suffix}`, // Snow showers slight
-        86: `13${suffix}`, // Snow showers heavy
-        95: `11${suffix}`, // Thunderstorm: Slight or moderate
-        96: `11${suffix}`, // Thunderstorm with slight hail
-        99: `11${suffix}`, // Thunderstorm with heavy hail
-    }
-
-    const iconCode = iconMapping[code] ?? `01${suffix}` // Default to clear sky
-    //console.log('WeatherIcon - iconCode:', iconCode)
-    return iconCode
+  const iconMapping = {
+    0: { icon: `01${suffix}`, description: "Clear sky" },
+    1: { icon: `02${suffix}`, description: "Mainly clear" },
+    2: { icon: `03${suffix}`, description: "Partly cloudy" },
+    3: { icon: `04${suffix}`, description: "Overcast" },
+    45: { icon: `50${suffix}`, description: "Fog" },
+    48: { icon: `50${suffix}`, description: "Depositing rime fog" },
+    51: { icon: `09${suffix}`, description: "Drizzle: Light intensity" },
+    53: { icon: `09${suffix}`, description: "Drizzle: Moderate intensity" },
+    55: { icon: `09${suffix}`, description: "Drizzle: Dense intensity" },
+    56: { icon: `13${suffix}`, description: "Freezing Drizzle: Light intensity" },
+    57: { icon: `13${suffix}`, description: "Freezing Drizzle: Dense intensity" },
+    61: { icon: `10${suffix}`, description: "Rain: Slight intensity" },
+    63: { icon: `10${suffix}`, description: "Rain: Moderate intensity" },
+    65: { icon: `10${suffix}`, description: "Rain: Heavy intensity" },
+    66: { icon: `13${suffix}`, description: "Freezing Rain: Light intensity" },
+    67: { icon: `13${suffix}`, description: "Freezing Rain: Heavy intensity" },
+    71: { icon: `13${suffix}`, description: "Snow fall: Slight intensity" },
+    73: { icon: `13${suffix}`, description: "Snow fall: Moderate intensity" },
+    75: { icon: `13${suffix}`, description: "Snow fall: Heavy intensity" },
+    77: { icon: `13${suffix}`, description: "Snow grains" },
+    80: { icon: `09${suffix}`, description: "Rain showers: Slight" },
+    81: { icon: `09${suffix}`, description: "Rain showers: Moderate" },
+    82: { icon: `09${suffix}`, description: "Rain showers: Violent" },
+    85: { icon: `13${suffix}`, description: "Snow showers slight" },
+    86: { icon: `13${suffix}`, description: "Snow showers heavy" },
+    95: { icon: `11${suffix}`, description: "Thunderstorm: Slight or moderate" },
+    96: { icon: `11${suffix}`, description: "Thunderstorm with slight hail" },
+    99: { icon: `11${suffix}`, description: "Thunderstorm with heavy hail" },
   }
+
+  // Default to "Clear sky" if not found
+  const iconData = iconMapping[weatherCode] || { icon: `01${suffix}`, description: "Clear sky" };
+  //console.log('WeatherIcon - iconData:', iconData)
 
   return (
     <img
         src={`https://openweathermap.org/img/wn/` +
-              `${getWeatherIcon(weatherCode, isDay)}` +
+              `${iconData.icon}` +
               `@2x.png`}
-        alt="Weather Icon"
+        alt={`Weather icon of ${iconData.description}`}
     />
   )
 }

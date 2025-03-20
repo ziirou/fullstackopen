@@ -20,7 +20,7 @@ const CountryInfo = ( {country} ) => {
       </ul>
       <img className='flag'
         src={country.flags.png}
-        alt={country.name.common}
+        alt={`Flag of ${country.name.common}`}
       />
       <Weather
         capital={country.capital[0]}
