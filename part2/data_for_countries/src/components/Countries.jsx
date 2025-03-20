@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Country from './Country'
 import CountryInfo from './CountryInfo'
 
@@ -16,6 +16,11 @@ const Countries = ( {countries, filter} ) => {
         country.name.common.toLowerCase().includes(filter.toLowerCase())
       )
     : countries
+
+  // Reset selectedCountry when the filter changes
+  useEffect(() => {
+    setSelectedCountry(null)
+  }, [filter])
 
   //console.log('Countries - countriesToShow.length:', countriesToShow.length)
   if (countriesToShow.length > 10) {
