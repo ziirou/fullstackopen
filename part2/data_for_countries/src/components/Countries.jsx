@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Country from './Country'
 import CountryInfo from './CountryInfo'
 
@@ -8,8 +9,9 @@ const Countries = ( {countries, filter} ) => {
 
   //console.log('Countries - countries:', countries)
 
-  let countriesToShow = []
-  countriesToShow = filter
+  const [selectedCountry, setSelectedCountry] = useState(null)
+
+  const countriesToShow = filter
     ? countries.filter(country =>
         country.name.common.toLowerCase().includes(filter.toLowerCase())
       )
@@ -17,24 +19,30 @@ const Countries = ( {countries, filter} ) => {
 
   //console.log('Countries - countriesToShow.length:', countriesToShow.length)
   if (countriesToShow.length > 10) {
-    return (
-      <p>Too many matches, specify another filter</p>
-    )
+    return <p>Too many matches, specify another filter</p>
   } else if (countriesToShow.length === 1) {
-    return (
-      <CountryInfo country={countriesToShow[0]} />
-    )
+    return <CountryInfo country={countriesToShow[0]} />
   }
 
   //console.log('Countries - countriesToShow:', countriesToShow)
 
+  const handleShowInfo = (country) => {
+    //console.log('handleShowInfo - country:', country)
+    setSelectedCountry(country)
+  }
+
   return (
     <div>
-      {countriesToShow.map(country =>
-        <Country
-          key={country.ccn3}
-          country={country}
-        />
+      {selectedCountry ? (
+        <CountryInfo country={selectedCountry} />
+      ) : (
+        countriesToShow.map(country =>
+          <Country
+            key={country.ccn3}
+            country={country}
+            onShowInfo={() => handleShowInfo(country)}
+          />
+        )
       )}
     </div>
   )

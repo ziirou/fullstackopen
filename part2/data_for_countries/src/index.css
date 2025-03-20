@@ -6,6 +6,10 @@ sup {
   vertical-align: text-top;
 }
 
+button {
+  margin-left: 5px;
+}
+
 input {
   margin-left: 2px;
 }
