@@ -61,6 +61,25 @@ const generateId = () => {
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
+  if (!body.name) {
+    return response.status(400).json({ 
+      error: 'name missing' 
+    })
+  } else if (!body.number) {
+    return response.status(400).json({ 
+      error: 'number missing' 
+    })
+  }
+
+  const matchPerson = persons.find(person => 
+    person.name.toLowerCase() === body.name.toLowerCase())
+
+  if (matchPerson) {
+    return response.status(400).json({ 
+      error: `person '${matchPerson.name}' already exists` 
+    })
+  }
+
   const person = {
     id: generateId(),
     name: body.name,
@@ -81,7 +100,9 @@ app.delete('/api/persons/:id', (request, response) => {
 
     response.status(204).end()
   } else {
-    response.status(404).end()
+    return response.status(404).json({ 
+      error: 'person already deleted' 
+    })
   }
 })
 
