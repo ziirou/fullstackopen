@@ -9,5 +9,8 @@
   },
   "author": "Tero Nikula",
   "license": "MIT",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
