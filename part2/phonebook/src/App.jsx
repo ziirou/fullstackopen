@@ -165,14 +165,14 @@ const App = () => {
     personService
       .remove(id)
       .then(returnedPerson => {
-        console.log(returnedPerson)
+        //console.log(`returnedPerson: ${returnedPerson}`)
         persons.map(person =>
           person.id !== id
           ? person
           : returnedPerson)
 
         setNotification({
-          message: `Deleted ${returnedPerson.name}`,
+          message: `Deleted ${person.name}`,
           type: 'notification'
         })
         setTimeout(() => {
