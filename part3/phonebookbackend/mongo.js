@@ -21,11 +21,11 @@ if (process.argv.length > 3) {
   })
 
   person.save()
-    .then(result => {
+    .then(() => {
       console.log(`added ${person.name} '${person.number}' to phonebook`)
       mongoose.connection.close()
     })
-    .catch(error => 
+    .catch(error =>
       console.log(`Error: ${error}`)
     )
 } else {

@@ -22,7 +22,7 @@ app.get('/', (request, response) => {
 app.get('/info', (request, response, next) => {
   Person.find({})
     .then(persons => {
-      const date = new Date().toString();
+      const date = new Date().toString()
       response.send(
         `<p>Phonebook has info for ${persons.length} people</p>` +
         `<p>${date}</p>`
@@ -81,14 +81,14 @@ app.put('/api/persons/:id', (request, response, next) => {
       { new: true, runValidators: true }
     )
     .then(updatedPerson => {
-        response.json(updatedPerson)
+      response.json(updatedPerson)
     })
     .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
