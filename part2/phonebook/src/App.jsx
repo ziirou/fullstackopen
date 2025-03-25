@@ -37,11 +37,11 @@ const App = () => {
   const replaceNumber = (id, personObject) => {
     const updatedPerson = { ...personObject, number: personObject.number }
 
-    console.log('updating person:', personObject)
+    //console.log('updating person:', personObject)
     personService
       .update(id, updatedPerson)
       .then(returnedPerson => {
-        console.log('updated person:', returnedPerson)
+        //console.log('updated person:', returnedPerson)
         setPersons(
           persons.map(person =>
             person.id !== id
@@ -114,26 +114,26 @@ const App = () => {
       const confirmNewName = confirm(`${personObject.name} is already added to phonebook, ` +
                                       `replace the old number with a new one?`)
       if (confirmNewName) {
-        console.log(`replacing number for ${matchPerson.name}`)
+        //console.log(`replacing number for ${matchPerson.name}`)
         replaceNumber(matchPerson.id, personObject)
         return
       } else {
-        console.log(`you canceled replacing number for ${matchPerson.name}`)
+        //console.log(`you canceled replacing number for ${matchPerson.name}`)
         return
       }
     }
 
-    console.log('adding new person:', personObject)
+    //console.log('adding new person:', personObject)
     personService
       .create(personObject)
-      .then(returnedPerson => {
-        console.log(returnedPerson)
-        setPersons(persons.concat(returnedPerson))
+      .then(createdPerson => {
+        //console.log(createdPerson)
+        setPersons(persons.concat(createdPerson))
         setNewName('')
         setNewNumber('')
 
         setNotification({
-          message: `Added ${returnedPerson.name}`,
+          message: `Added ${createdPerson.name}`,
           type: 'notification'
         })
         setTimeout(() => {
@@ -144,7 +144,7 @@ const App = () => {
         console.log(error)
 
         setNotification({
-          message: `Error ${error.status} on adding ${personObject.name} to phonebook.`,
+          message: error.response.data.error,
           type: 'error'
         })
         setTimeout(() => {
@@ -156,9 +156,9 @@ const App = () => {
   const deletePerson = (id) => {
     const person = persons.find(p => p.id === id)
     if (confirm(`Delete ${person.name} from phonebook?`)) {
-      console.log(`deleting person ${person.name}`)
+      //console.log(`deleting person ${person.name}`)
     } else {
-      console.log(`you canceled deleting ${person.name}`)
+      //console.log(`you canceled deleting ${person.name}`)
       return
     }
 
