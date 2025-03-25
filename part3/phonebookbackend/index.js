@@ -7,10 +7,10 @@ const app = express()
 
 app.use(express.static('dist'))
 app.use(express.json())
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-content'))
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :json-content'))
 
-morgan.token('post-content', (request) =>
-  request.method === 'POST' && request.body
+morgan.token('json-content', (request) =>
+  (request.method === 'POST' || request.method === 'PUT') && request.body
     ? JSON.stringify(request.body)
     : ''
 )
