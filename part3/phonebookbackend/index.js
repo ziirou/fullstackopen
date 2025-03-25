@@ -102,20 +102,16 @@ app.post('/api/persons', (request, response, next) => {
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
-  const { name, number } = request.body
+  const body = request.body
 
-  Person.findById(request.params.id)
-    .then(person => {
-      if (!person) {
-        return response.status(404).end()
-      }
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
 
-      person.name = name
-      person.number = number
-
-      return person.save().then((updatedPerson) => {
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPerson => {
         response.json(updatedPerson)
-      })
     })
     .catch(error => next(error))
 })
