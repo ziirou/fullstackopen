@@ -58,17 +58,6 @@ app.post('/api/persons', (request, response, next) => {
     return response.status(400).json({ error: 'number missing' })
   }
 
-/*
-  const matchPerson = localPersons.find(person => 
-    person.name.toLowerCase() === body.name.toLowerCase())
-
-  if (matchPerson) {
-    return response.status(400).json({ 
-      error: `person '${matchPerson.name}' already exists` 
-    })
-  }
-*/
-
   const person = new Person({
     name: body.name,
     number: body.number,
@@ -111,6 +100,8 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
+  } else if (error.message.indexOf('duplicate key error') !== -1) {
+    return response.status(400).json({ error: 'duplicate key error' })
   }
 
   next(error)
