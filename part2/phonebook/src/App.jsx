@@ -63,7 +63,7 @@ const App = () => {
         console.log(error)
 
         setNotification({
-          message: `Error ${error.status} on updating ${personObject.name} to phonebook.`,
+          message: error.response.data.error,
           type: 'error'
         })
         setTimeout(() => {
