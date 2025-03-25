@@ -67,24 +67,16 @@ app.get('/api/persons/:id', (request, response) => {
   }
 })
 
-const generateId = () => {
-  const randomId = Math.floor(Math.random() * 100)
-  return String(randomId)
-}
-
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
   if (!body.name) {
-    return response.status(400).json({ 
-      error: 'name missing' 
-    })
+    return response.status(400).json({ error: 'name missing' })
   } else if (!body.number) {
-    return response.status(400).json({ 
-      error: 'number missing' 
-    })
+    return response.status(400).json({ error: 'number missing' })
   }
 
+/*
   const matchPerson = localPersons.find(person => 
     person.name.toLowerCase() === body.name.toLowerCase())
 
@@ -93,16 +85,16 @@ app.post('/api/persons', (request, response) => {
       error: `person '${matchPerson.name}' already exists` 
     })
   }
+*/
 
-  const person = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  }
+  })
 
-  localPersons = localPersons.concat(person)
-
-  response.json(person)
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
