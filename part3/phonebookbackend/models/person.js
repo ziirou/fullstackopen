@@ -22,7 +22,18 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
-    minlength: 8,
+    validate: {
+      validator: function(v) {
+        /*
+          ^...$   → Anchors the regex to match the entire string.
+          \d{2,3} → Matches 2-3 digits in the first part.
+          -       → Ensures a hyphen separates the two parts.
+          \d{7,8} → Matches 7-8 digits in the second part.
+        */
+        return /^\d{2,3}-\d{7,8}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    },
     required: true
   },
 })
