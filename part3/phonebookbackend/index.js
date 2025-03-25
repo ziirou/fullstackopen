@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
 
 const app = express()
 
@@ -14,7 +15,7 @@ morgan.token('post-content', (request) =>
     : ''
 )
 
-let persons = [
+let localPersons = [
   {
     id: "1",
     name: "Arto Hellas",
@@ -44,18 +45,20 @@ app.get('/', (request, response) => {
 app.get('/info', (request, response) => {
   const date = new Date().toString();
   response.send(
-    `<p>Phonebook has info for ${persons.length} people</p>` +
+    `<p>Phonebook has info for ${localPersons.length} people</p>` +
     `<p>${date}</p>`
   )
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  const person = persons.find(person => person.id === id)
+  const person = localPersons.find(person => person.id === id)
 
   if (person) {
     response.json(person)
@@ -82,7 +85,7 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
-  const matchPerson = persons.find(person => 
+  const matchPerson = localPersons.find(person => 
     person.name.toLowerCase() === body.name.toLowerCase())
 
   if (matchPerson) {
@@ -97,17 +100,17 @@ app.post('/api/persons', (request, response) => {
     number: body.number,
   }
 
-  persons = persons.concat(person)
+  localPersons = localPersons.concat(person)
 
   response.json(person)
 })
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  const person = persons.find(person => person.id === id)
+  const person = localPersons.find(person => person.id === id)
 
   if (person) {
-    persons = persons.filter(person => person.id !== id)
+    localPersons = localPersons.filter(person => person.id !== id)
 
     response.status(204).end()
   } else {
