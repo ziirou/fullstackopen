@@ -157,3 +157,40 @@ describe('most blogs', () => {
     assert.deepStrictEqual(result, mostBlogsAuthor)
   })
 })
+
+describe('most likes', () => {
+  test('of empty list is zero', () => {
+    assert.strictEqual(listHelper.mostLikes([]), 0)
+  })
+
+  const listWithOneBlog = [
+    {
+      _id: '5a422b3a1b54a676234d17f9',
+      title: 'Canonical string reduction',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+      likes: 12,
+      __v: 0
+    }
+  ]
+
+  const oneBlogAuthor = {
+    author: 'Edsger W. Dijkstra',
+    likes: 12
+  }
+
+  test('when list has only one blog', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    assert.deepStrictEqual(result, oneBlogAuthor)
+  })
+
+  const mostLikesAuthor = {
+    author: 'Edsger W. Dijkstra',
+    likes: 17
+  }
+
+  test('of a bigger list', () => {
+    const result = listHelper.mostLikes(blogs)
+    assert.deepStrictEqual(result, mostLikesAuthor)
+  })
+})
