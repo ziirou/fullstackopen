@@ -120,3 +120,40 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(result, favorite)
   })
 })
+
+describe('most blogs', () => {
+  test('of empty list is zero', () => {
+    assert.strictEqual(listHelper.mostBlogs([]), 0)
+  })
+
+  const listWithOneBlog = [
+    {
+      _id: '5a422b3a1b54a676234d17f9',
+      title: 'Canonical string reduction',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+      likes: 12,
+      __v: 0
+    }
+  ]
+
+  const oneBlogAuthor = {
+    author: 'Edsger W. Dijkstra',
+    blogs: 1
+  }
+
+  test('when list has only one blog', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog)
+    assert.deepStrictEqual(result, oneBlogAuthor)
+  })
+
+  const mostBlogsAuthor = {
+    author: 'Robert C. Martin',
+    blogs: 3
+  }
+
+  test('of a bigger list', () => {
+    const result = listHelper.mostBlogs(blogs)
+    assert.deepStrictEqual(result, mostBlogsAuthor)
+  })
+})
