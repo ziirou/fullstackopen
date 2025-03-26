@@ -3,8 +3,8 @@ const dummy = () => {
 }
 
 const totalLikes = (blogs) => {
-  const reducer = (sum, blog_object) => {
-    const likes = blog_object.likes
+  const reducer = (sum, blog) => {
+    const likes = blog.likes
     return sum + likes
   }
 
