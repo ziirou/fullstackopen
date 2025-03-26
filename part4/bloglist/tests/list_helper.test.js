@@ -87,3 +87,36 @@ describe('total likes', () => {
     assert.strictEqual(result, 36)
   })
 })
+
+describe('favorite blog', () => {
+  test('of empty list is zero', () => {
+    assert.strictEqual(listHelper.favoriteBlog([]), 0)
+  })
+
+  const listWithOneBlog = [
+    {
+      _id: '5a422b3a1b54a676234d17f9',
+      title: 'Canonical string reduction',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+      likes: 12,
+      __v: 0
+    }
+  ]
+
+  const favorite = {
+    title: 'Canonical string reduction',
+    author: 'Edsger W. Dijkstra',
+    likes: 12
+  }
+
+  test('when list has only one blog', () => {
+    const result = listHelper.favoriteBlog(listWithOneBlog)
+    assert.deepStrictEqual(result, favorite)
+  })
+
+  test('of a bigger list', () => {
+    const result = listHelper.favoriteBlog(blogs)
+    assert.deepStrictEqual(result, favorite)
+  })
+})
