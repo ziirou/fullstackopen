@@ -26,7 +26,7 @@ describe('When there is initially some blogs saved', () => {
 
       assert.strictEqual(Array.isArray(blogs), true)
 
-      for (const blog of blogs) {  // Use for...of to handle async properly
+      for (const blog of blogs) {
         assert.strictEqual(typeof blog.title, 'string')
         assert.strictEqual(typeof blog.author, 'string')
         assert.strictEqual(typeof blog.url, 'string')
@@ -51,11 +51,42 @@ describe('When there is initially some blogs saved', () => {
     test('Blogs have id instead of _id', async () => {
       const blogs = await testHelper.blogsInDb()
 
-      for (const blog of blogs) {  // Use for...of to handle async properly
+      for (const blog of blogs) {
         assert(blog.id, 'Blog should have an id property')
         assert.strictEqual(typeof blog.id, 'string', 'id should be a string')
         assert.strictEqual('_id' in blog, false, 'Blog should not have _id property')
       }
+    })
+  })
+
+  describe('Addition of a new blog', () => {
+    test('Succeeds with valid data', async () => {
+      const newBlog = {
+        title: 'Fourth Blog',
+        author: 'First Person',
+        url: 'fourth_url',
+        likes: 444,
+      }
+
+      const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await testHelper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length + 1)
+
+      const addedBlog = response.body
+      assert.strictEqual(typeof addedBlog.title, 'string')
+      assert.strictEqual(typeof addedBlog.author, 'string')
+      assert.strictEqual(typeof addedBlog.url, 'string')
+      assert.strictEqual(typeof addedBlog.likes, 'number')
+      assert.strictEqual(typeof addedBlog.id, 'string')
+
+      const addedBlogWithoutId = { ...addedBlog }
+      delete addedBlogWithoutId.id
+      assert.deepStrictEqual(addedBlogWithoutId, newBlog)
     })
   })
 })
