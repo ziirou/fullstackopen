@@ -88,6 +88,26 @@ describe('When there is initially some blogs saved', () => {
       delete addedBlogWithoutId.id
       assert.deepStrictEqual(addedBlogWithoutId, newBlog)
     })
+
+    test('Sets likes=0 if likes is missing or not number', async () => {
+      const newBlog = {
+        title: 'No Number Blog',
+        author: 'First Person',
+        url: 'blog_url',
+        //likes: 'number',
+      }
+
+      const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await testHelper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length + 1)
+
+      assert.strictEqual(response.body.likes, 0)
+    })
   })
 })
 
