@@ -26,14 +26,13 @@ describe('When there is initially some blogs saved', () => {
 
       assert.strictEqual(Array.isArray(blogs), true)
 
-      console.log('blogs:', blogs)
-
-      blogs.forEach(blog => {
+      for (const blog of blogs) {  // Use for...of to handle async properly
         assert.strictEqual(typeof blog.title, 'string')
         assert.strictEqual(typeof blog.author, 'string')
         assert.strictEqual(typeof blog.url, 'string')
         assert.strictEqual(typeof blog.likes, 'number')
-      })
+        assert.strictEqual(typeof blog.id, 'string')
+      }
     })
 
     test('All blogs are returned', async () => {
@@ -47,6 +46,16 @@ describe('When there is initially some blogs saved', () => {
 
       const titles = response.body.map(r => r.title)
       assert(titles.includes('First Blog'))
+    })
+
+    test('Blogs have id instead of _id', async () => {
+      const blogs = await testHelper.blogsInDb()
+
+      for (const blog of blogs) {  // Use for...of to handle async properly
+        assert(blog.id, 'Blog should have an id property')
+        assert.strictEqual(typeof blog.id, 'string', 'id should be a string')
+        assert.strictEqual('_id' in blog, false, 'Blog should not have _id property')
+      }
     })
   })
 })
