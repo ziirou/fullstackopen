@@ -159,6 +159,59 @@ describe('When there is initially some blogs saved', () => {
       assert(!titles.includes(blogToDelete.title))
     })
   })
+
+  describe('Editing a blog', () => {
+    test('Succeeds with status code 200 with valid data', async () => {
+      const blogsAtStart = await testHelper.blogsInDb()
+
+      const idBlogToEdit = blogsAtStart[0].id
+      const editedBlog = {
+        title: 'Edited Blog',
+        author: 'First Person',
+        url: 'edited_url',
+        likes: 888
+      }
+
+      const response = await api
+        .put(`/api/blogs/${idBlogToEdit}`)
+        .send(editedBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const updatedBlogWithoutId = { ...response.body }
+      delete updatedBlogWithoutId.id
+      assert.deepStrictEqual(updatedBlogWithoutId, editedBlog)
+    })
+
+    test('Fails with status code 400 if id is invalid', async () => {
+      const invalidId = '67e3a3b9b5d42fe75af929'
+
+      await api
+        .put(`/api/blogs/${invalidId}`)
+        .expect(400)
+    })
+
+    test('Fails with status code 400 if data invalid', async () => {
+      const blogsAtStart = await testHelper.blogsInDb()
+
+      const idBlogToEdit = blogsAtStart[0].id
+      const editedBlog = {
+        author: 'First Person',
+        url: 'edited_url',
+        likes: 888
+      }
+
+      const response = await api
+        .put(`/api/blogs/${idBlogToEdit}`)
+        .send(editedBlog)
+        .expect(400)
+        .expect('Content-Type', /application\/json/)
+
+      assert.notDeepStrictEqual(response.body, blogsAtStart[0])
+
+      assert('error' in response.body)
+    })
+  })
 })
 
 after(async () => {
