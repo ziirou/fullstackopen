@@ -60,7 +60,7 @@ describe('When there is initially some blogs saved', () => {
   })
 
   describe('Addition of a new blog', () => {
-    test('Succeeds with valid data', async () => {
+    test('Succeeds with status code 201 with valid data', async () => {
       const newBlog = {
         title: 'Fourth Blog',
         author: 'First Person',
@@ -139,6 +139,24 @@ describe('When there is initially some blogs saved', () => {
 
       const blogsAtEnd = await testHelper.blogsInDb()
       assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length)
+    })
+  })
+
+  describe('Deletion of a blog', () => {
+    test('Succeeds with status code 204 if id is valid', async () => {
+      const blogsAtStart = await testHelper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+      const blogsAtEnd = await testHelper.blogsInDb()
+
+      assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length - 1)
+
+      const titles = blogsAtEnd.map(r => r.title)
+      assert(!titles.includes(blogToDelete.title))
     })
   })
 })
