@@ -108,6 +108,38 @@ describe('When there is initially some blogs saved', () => {
 
       assert.strictEqual(response.body.likes, 0)
     })
+
+    test('Fails with status code 400 if title is missing', async () => {
+      const newBlog = {
+        author: 'First Person',
+        url: 'blog_url',
+        likes: 666,
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+      const blogsAtEnd = await testHelper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length)
+    })
+
+    test('Fails with status code 400 if url is missing', async () => {
+      const newBlog = {
+        title: 'No URL Blog',
+        author: 'First Person',
+        likes: 666,
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+      const blogsAtEnd = await testHelper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length)
+    })
   })
 })
 
