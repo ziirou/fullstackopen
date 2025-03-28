@@ -27,7 +27,7 @@ blogsRouter.put('/:id', async (request, response) => {
 
   const blog = await Blog.findById(request.params.id)
   if (!blog) {
-    response.status(404).end()
+    return response.status(404).end()
   }
 
   blog.title = body.title
@@ -35,8 +35,13 @@ blogsRouter.put('/:id', async (request, response) => {
   blog.url = body.url
   blog.likes = body.likes || 0
 
-  const updatedBlog = await blog.save()
-  response.status(200).json(updatedBlog)
+  const updatedBlog = await Blog
+    .findByIdAndUpdate(
+      request.params.id,
+      blog,
+      { new: true, runValidators: true }
+    )
+  response.json(updatedBlog)
 })
 
 module.exports = blogsRouter

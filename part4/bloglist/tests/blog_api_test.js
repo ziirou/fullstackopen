@@ -191,14 +191,22 @@ describe('When there is initially some blogs saved', () => {
         .expect(400)
     })
 
+    test('Fails with status code 404 if id is missing', async () => {
+      const missingId = '67e41aa5c7dac7fedfabf18b'
+
+      await api
+        .put(`/api/blogs/${missingId}`)
+        .expect(404)
+    })
+
     test('Fails with status code 400 if data invalid', async () => {
       const blogsAtStart = await testHelper.blogsInDb()
 
       const idBlogToEdit = blogsAtStart[0].id
       const editedBlog = {
-        author: 'First Person',
-        url: 'edited_url',
-        likes: 888
+        author: null,
+        url: null,
+        likes: 'invalid'
       }
 
       const response = await api
