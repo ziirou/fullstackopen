@@ -9,18 +9,28 @@ const testHelper = require('./test_helper')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+let token = ''
+
 describe('When there is initially some blogs saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
     await User.deleteMany({})
 
-    const passwordHash = await bcrypt.hash('secret', 10)
+    const passwordHash = await bcrypt.hash(testHelper.initialUser.password, 10)
     const user = new User({
-      ...testHelper.initialUser,
-      passwordHash
+      username: testHelper.initialUser.username,
+      name: testHelper.initialUser.name,
+      passwordHash: passwordHash,
+      blogs: [],
     })
 
     await user.save()
+
+    // Login to get token
+    const loginResponse = await api
+      .post('/api/login')
+      .send(testHelper.initialUser)
+    token = loginResponse.body.token
 
     // Add user ID to each initial blog
     const blogsWithUser = testHelper.initialBlogs
@@ -36,6 +46,7 @@ describe('When there is initially some blogs saved', () => {
     test('Content-Type is application/json', async () => {
       await api
         .get('/api/blogs')
+        .set({ 'Authorization': `Bearer ${token}` })
         .expect(200)
         .expect('Content-Type', /application\/json/)
     })
@@ -51,17 +62,22 @@ describe('When there is initially some blogs saved', () => {
         assert.strictEqual(typeof blog.url, 'string')
         assert.strictEqual(typeof blog.likes, 'number')
         assert.strictEqual(typeof blog.id, 'string')
+        assert.strictEqual(typeof blog.user, 'object')
       }
     })
 
     test('All blogs are returned', async () => {
-      const response = await api.get('/api/blogs')
+      const response = await api
+        .get('/api/blogs')
+        .set({ 'Authorization': `Bearer ${token}` })
 
       assert.strictEqual(response.body.length, testHelper.initialBlogs.length)
     })
 
     test('A specific blog is within the returned blogs', async () => {
-      const response = await api.get('/api/blogs')
+      const response = await api
+        .get('/api/blogs')
+        .set({ 'Authorization': `Bearer ${token}` })
 
       const titles = response.body.map(r => r.title)
       assert(titles.includes('First Blog'))
@@ -80,18 +96,16 @@ describe('When there is initially some blogs saved', () => {
 
   describe('Addition of a new blog', () => {
     test('Succeeds with status code 201 with valid data', async () => {
-      const user = await User.findOne()
-
       const newBlog = {
-        title: 'Fourth Blog',
-        author: 'First Person',
-        url: 'fourth_url',
+        title: 'New Blog',
+        author: 'New Person',
+        url: 'new_url',
         likes: 444,
-        user: user._id.toString(),
       }
 
       const response = await api
         .post('/api/blogs')
+        .set({ 'Authorization': `Bearer ${token}` })
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -105,25 +119,24 @@ describe('When there is initially some blogs saved', () => {
       assert.strictEqual(typeof addedBlog.url, 'string')
       assert.strictEqual(typeof addedBlog.likes, 'number')
       assert.strictEqual(typeof addedBlog.id, 'string')
+      assert.strictEqual(typeof addedBlog.user, 'string')
 
-      const addedBlogWithoutId = { ...addedBlog }
-      delete addedBlogWithoutId.id
-      assert.deepStrictEqual(addedBlogWithoutId, newBlog)
+      delete addedBlog.id
+      delete addedBlog.user
+      assert.deepStrictEqual(addedBlog, newBlog)
     })
 
     test('Sets likes=0 if likes is missing or not number', async () => {
-      const user = await User.findOne()
-
       const newBlog = {
         title: 'No Number Blog',
-        author: 'First Person',
-        url: 'blog_url',
+        author: 'No Number Person',
+        url: 'no_number_url',
         //likes: 'number',
-        user: user._id.toString(),
       }
 
       const response = await api
         .post('/api/blogs')
+        .set({ 'Authorization': `Bearer ${token}` })
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -134,18 +147,30 @@ describe('When there is initially some blogs saved', () => {
       assert.strictEqual(response.body.likes, 0)
     })
 
-    test('Fails with status code 400 if title is missing', async () => {
-      const user = await User.findOne()
-
+    test('Fails with status code 401 if token is missing', async () => {
       const newBlog = {
-        author: 'First Person',
-        url: 'blog_url',
+        title: 'New Blog',
+        author: 'New Person',
+        url: 'new_url',
         likes: 666,
-        user: user._id.toString(),
       }
 
       await api
         .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+    })
+
+    test('Fails with status code 400 if title is missing', async () => {
+      const newBlog = {
+        author: 'New Person',
+        url: 'new_url',
+        likes: 666,
+      }
+
+      await api
+        .post('/api/blogs')
+        .set({ 'Authorization': `Bearer ${token}` })
         .send(newBlog)
         .expect(400)
 
@@ -154,17 +179,15 @@ describe('When there is initially some blogs saved', () => {
     })
 
     test('Fails with status code 400 if url is missing', async () => {
-      const user = await User.findOne()
-
       const newBlog = {
         title: 'No URL Blog',
-        author: 'First Person',
+        author: 'No URL Person',
         likes: 666,
-        user: user._id.toString(),
       }
 
       await api
         .post('/api/blogs')
+        .set({ 'Authorization': `Bearer ${token}` })
         .send(newBlog)
         .expect(400)
 
@@ -180,6 +203,7 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set({ 'Authorization': `Bearer ${token}` })
         .expect(204)
 
       const blogsAtEnd = await testHelper.blogsInDb()
@@ -189,31 +213,40 @@ describe('When there is initially some blogs saved', () => {
       const titles = blogsAtEnd.map(r => r.title)
       assert(!titles.includes(blogToDelete.title))
     })
+
+    test('Fails with status code 401 if token is missing', async () => {
+      const blogsAtStart = await testHelper.blogsInDb()
+      const blogToDelete = blogsAtStart[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(401)
+    })
   })
 
   describe('Editing a blog', () => {
     test('Succeeds with status code 200 with valid data', async () => {
       const blogsAtStart = await testHelper.blogsInDb()
-      const user = await User.findOne()
 
       const idBlogToEdit = blogsAtStart[0].id
       const editedBlog = {
         title: 'Edited Blog',
-        author: 'First Person',
+        author: 'Edited Person',
         url: 'edited_url',
         likes: 888,
-        user: user._id.toString(),
       }
 
       const response = await api
         .put(`/api/blogs/${idBlogToEdit}`)
+        .set({ 'Authorization': `Bearer ${token}` })
         .send(editedBlog)
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
-      const updatedBlogWithoutId = { ...response.body }
-      delete updatedBlogWithoutId.id
-      assert.deepStrictEqual(updatedBlogWithoutId, editedBlog)
+      const updatedBlog = response.body
+      delete updatedBlog.id
+      delete updatedBlog.user
+      assert.deepStrictEqual(updatedBlog, editedBlog)
     })
 
     test('Fails with status code 400 if id is invalid', async () => {
@@ -221,6 +254,7 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${invalidId}`)
+        .set({ 'Authorization': `Bearer ${token}` })
         .expect(400)
     })
 
@@ -229,23 +263,23 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${missingId}`)
+        .set({ 'Authorization': `Bearer ${token}` })
         .expect(404)
     })
 
     test('Fails with status code 400 if data invalid', async () => {
       const blogsAtStart = await testHelper.blogsInDb()
-      const user = await User.findOne()
 
       const idBlogToEdit = blogsAtStart[0].id
       const editedBlog = {
         author: null,
         url: null,
         likes: 'invalid',
-        user: user._id.toString(),
       }
 
       const response = await api
         .put(`/api/blogs/${idBlogToEdit}`)
+        .set({ 'Authorization': `Bearer ${token}` })
         .send(editedBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)

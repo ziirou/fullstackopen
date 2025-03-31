@@ -4,8 +4,7 @@ const User = require('../models/user')
 const initialUser = {
   username: 'initial_user',
   name: 'Initial User',
-  //passwordHash: 'added in beforeEach',
-  blogs: []
+  password: 'initial_password',
 }
 
 const initialBlogs = [
