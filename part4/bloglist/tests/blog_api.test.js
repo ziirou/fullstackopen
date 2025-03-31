@@ -4,13 +4,32 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
+const bcrypt = require('bcryptjs')
 const testHelper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 describe('When there is initially some blogs saved', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
-    await Blog.insertMany(testHelper.initialBlogs)
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('secret', 10)
+    const user = new User({
+      ...testHelper.initialUser,
+      passwordHash
+    })
+
+    await user.save()
+
+    // Add user ID to each initial blog
+    const blogsWithUser = testHelper.initialBlogs
+      .map(blog => ({
+        ...blog,
+        user: user._id.toString()
+      }))
+
+    await Blog.insertMany(blogsWithUser)
   })
 
   describe('Fetch all blogs', () => {
@@ -61,11 +80,14 @@ describe('When there is initially some blogs saved', () => {
 
   describe('Addition of a new blog', () => {
     test('Succeeds with status code 201 with valid data', async () => {
+      const user = await User.findOne()
+
       const newBlog = {
         title: 'Fourth Blog',
         author: 'First Person',
         url: 'fourth_url',
         likes: 444,
+        user: user._id.toString(),
       }
 
       const response = await api
@@ -90,11 +112,14 @@ describe('When there is initially some blogs saved', () => {
     })
 
     test('Sets likes=0 if likes is missing or not number', async () => {
+      const user = await User.findOne()
+
       const newBlog = {
         title: 'No Number Blog',
         author: 'First Person',
         url: 'blog_url',
         //likes: 'number',
+        user: user._id.toString(),
       }
 
       const response = await api
@@ -110,10 +135,13 @@ describe('When there is initially some blogs saved', () => {
     })
 
     test('Fails with status code 400 if title is missing', async () => {
+      const user = await User.findOne()
+
       const newBlog = {
         author: 'First Person',
         url: 'blog_url',
         likes: 666,
+        user: user._id.toString(),
       }
 
       await api
@@ -126,10 +154,13 @@ describe('When there is initially some blogs saved', () => {
     })
 
     test('Fails with status code 400 if url is missing', async () => {
+      const user = await User.findOne()
+
       const newBlog = {
         title: 'No URL Blog',
         author: 'First Person',
         likes: 666,
+        user: user._id.toString(),
       }
 
       await api
@@ -163,13 +194,15 @@ describe('When there is initially some blogs saved', () => {
   describe('Editing a blog', () => {
     test('Succeeds with status code 200 with valid data', async () => {
       const blogsAtStart = await testHelper.blogsInDb()
+      const user = await User.findOne()
 
       const idBlogToEdit = blogsAtStart[0].id
       const editedBlog = {
         title: 'Edited Blog',
         author: 'First Person',
         url: 'edited_url',
-        likes: 888
+        likes: 888,
+        user: user._id.toString(),
       }
 
       const response = await api
@@ -201,12 +234,14 @@ describe('When there is initially some blogs saved', () => {
 
     test('Fails with status code 400 if data invalid', async () => {
       const blogsAtStart = await testHelper.blogsInDb()
+      const user = await User.findOne()
 
       const idBlogToEdit = blogsAtStart[0].id
       const editedBlog = {
         author: null,
         url: null,
-        likes: 'invalid'
+        likes: 'invalid',
+        user: user._id.toString(),
       }
 
       const response = await api

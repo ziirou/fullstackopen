@@ -4,8 +4,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
-const testHelper = require('./test_helper')
 const bcrypt = require('bcryptjs')
+const testHelper = require('./test_helper')
 const User = require('../models/user')
 
 describe('When there is initially one user at db', () => {
@@ -13,7 +13,10 @@ describe('When there is initially one user at db', () => {
     await User.deleteMany({})
 
     const passwordHash = await bcrypt.hash('secret', 10)
-    const user = new User({ username: 'initial_user', passwordHash })
+    const user = new User({
+      ...testHelper.initialUser,
+      passwordHash
+    })
 
     await user.save()
   })
