@@ -46,7 +46,6 @@ describe('When there is initially some blogs saved', () => {
     test('Content-Type is application/json', async () => {
       await api
         .get('/api/blogs')
-        .set({ 'Authorization': `Bearer ${token}` })
         .expect(200)
         .expect('Content-Type', /application\/json/)
     })
@@ -69,7 +68,6 @@ describe('When there is initially some blogs saved', () => {
     test('All blogs are returned', async () => {
       const response = await api
         .get('/api/blogs')
-        .set({ 'Authorization': `Bearer ${token}` })
 
       assert.strictEqual(response.body.length, testHelper.initialBlogs.length)
     })
@@ -77,7 +75,6 @@ describe('When there is initially some blogs saved', () => {
     test('A specific blog is within the returned blogs', async () => {
       const response = await api
         .get('/api/blogs')
-        .set({ 'Authorization': `Bearer ${token}` })
 
       const titles = response.body.map(r => r.title)
       assert(titles.includes('First Blog'))
