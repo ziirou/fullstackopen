@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
+  const [notification, setNotification] = useState(null)
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -12,10 +14,29 @@ const App = () => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
+  const handleNotification = (message, type, timeout) => {
+    setNotification({
+      message: message,
+      type: type
+    })
+    setTimeout(() => {
+      setNotification(null)
+    }, timeout)
+  }
+
   useEffect(() => {
     const fetchBlogs = async () => {
-      const blogs = await blogService.getAll()
-      setBlogs(blogs)
+      try {
+        const blogs = await blogService.getAll()
+        setBlogs(blogs)
+      } catch (exception) {
+        console.log(exception)
+
+        handleNotification(
+          `Fetching blogs failed: ${exception.response.data.error || exception.status}`,
+          'error', 5000
+        )
+      }
     }
 
     fetchBlogs()
@@ -46,18 +67,39 @@ const App = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
+
+      handleNotification(
+        `${user.name} successfully logged in`,
+        'notification', 5000
+      )
     } catch (exception) {
       console.log('Login failed:', exception)
+
+      handleNotification(
+        `Login failed: ${exception.response.data.error || exception.status}`,
+        'error', 5000
+      )
     }
   }
 
   const handleLogout = () => {
     try {
+      const logoutUser = user.name
       window.localStorage.removeItem('loggedBloglistAppUser')
       setUser(null)
       blogService.setToken(null)
+
+      handleNotification(
+        `${logoutUser} successfully logged out`,
+        'notification', 5000
+      )
     } catch (exception) {
       console.log('Logout failed:', exception)
+
+      handleNotification(
+        `Logout failed: ${exception.response.data.error || exception.status}`,
+        'error', 5000
+      )
     }
   }
 
@@ -77,8 +119,25 @@ const App = () => {
       setTitle('')
       setAuthor('')
       setUrl('')
+
+      if (createdBlog.author) {
+        handleNotification(
+          `New blog created: '${createdBlog.title} by ${createdBlog.author}'`,
+          'notification', 5000
+        )
+      } else {
+        handleNotification(
+          `New blog '${createdBlog.title}' created without an author`,
+          'warning', 5000
+        )
+      }
     } catch (exception) {
       console.log('Blog creation failed:', exception)
+
+      handleNotification(
+        `Blog creation failed: ${exception.response.data.error || exception.status}`,
+        'error', 5000
+      )
     }
   }
 
@@ -111,7 +170,7 @@ const App = () => {
 
   const blogForm = () => (
     <div>
-      <h2>Create new</h2>
+      <h2>Create new blog</h2>
       <form onSubmit={handleCreateBlog}>
         <div>
           Title:
@@ -147,6 +206,8 @@ const App = () => {
 
   return (
     <div>
+      <Notification notification={notification} />
+
       {!user && loginForm()}
       {user && <div>
         <b>{user.name}</b> logged in
@@ -155,11 +216,12 @@ const App = () => {
           Logout
         </button>
 
+        {blogForm()}
+
         <h2>Blogs</h2>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
-        {blogForm()}
       </div>
       }
     </div>
