@@ -29,8 +29,8 @@ const App = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const blogs = await blogService.getAll()
-        setBlogs(blogs)
+        const fetchedBlogs = await blogService.getAll()
+        setBlogs([...fetchedBlogs].sort((less, more) => more.likes - less.likes))
       } catch (exception) {
         console.log(exception)
 
@@ -106,6 +106,7 @@ const App = () => {
       const createdBlog = await blogService.create(blogObject)
 
       blogFormRef.current.toggleVisibility()
+      /* No need to sort here as the new one goes to the bottom. */
       setBlogs(blogs.concat(createdBlog))
 
       if (createdBlog.author) {
@@ -136,7 +137,9 @@ const App = () => {
       await blogService.update(editedBlog)
       /* Blog component needs other user information
           in addition to user id, so let's not use the returned blog. */
-      setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : editedBlog))
+      setBlogs([...blogs]
+        .map(blog => blog.id !== blogObject.id ? blog : editedBlog)
+        .sort((less, more) => more.likes - less.likes))
     } catch(exception) {
       console.log('Blog editing failed:', exception)
 
