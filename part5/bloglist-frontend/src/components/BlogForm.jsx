@@ -1,12 +1,24 @@
-const BlogForm = ({
-  handleSubmit,
-  handleTitleChange,
-  handleAuthorChange,
-  handleUrlChange,
-  title,
-  author,
-  url
-}) => {
+import { useState } from 'react'
+
+const BlogForm = ({ handleCreateBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+
+    handleCreateBlog({
+      title: title,
+      author: author,
+      url: url,
+    })
+
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+  }
+
   return (
     <div>
       <h2>Create new blog</h2>
@@ -17,7 +29,7 @@ const BlogForm = ({
             type="text"
             value={title}
             name="Title"
-            onChange={handleTitleChange}
+            onChange={event => setTitle(event.target.value)}
           />
         </div>
         <div>
@@ -26,7 +38,7 @@ const BlogForm = ({
             type="text"
             value={author}
             name="Author"
-            onChange={handleAuthorChange}
+            onChange={event => setAuthor(event.target.value)}
           />
         </div>
         <div>
@@ -35,7 +47,7 @@ const BlogForm = ({
             type="text"
             value={url}
             name="URL"
-            onChange={handleUrlChange}
+            onChange={event => setUrl(event.target.value)}
           />
         </div>
         <button type="submit">Create</button>

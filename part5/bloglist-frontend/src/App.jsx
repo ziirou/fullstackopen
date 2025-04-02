@@ -12,12 +12,7 @@ import loginService from './services/login'
 const App = () => {
   const [notification, setNotification] = useState(null)
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   const blogFormRef = useRef()
 
@@ -58,9 +53,7 @@ const App = () => {
     }
   }, [])
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
+  const handleLogin = async ({ username, password }) => {
     try {
       const user = await loginService.login({
         username, password,
@@ -72,8 +65,6 @@ const App = () => {
 
       setUser(user)
       blogService.setToken(user.token)
-      setUsername('')
-      setPassword('')
 
       handleNotification(
         `${user.name} successfully logged in`,
@@ -110,23 +101,12 @@ const App = () => {
     }
   }
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
-
+  const handleCreateBlog = async (blogObject) => {
     try {
-      const blogObject = {
-        title: title,
-        author: author,
-        url: url,
-      }
-
       const createdBlog = await blogService.create(blogObject)
 
       blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(createdBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
 
       if (createdBlog.author) {
         handleNotification(
@@ -155,13 +135,7 @@ const App = () => {
 
       {!user &&
         <Togglable buttonLabel="Log in">
-          <LoginForm
-            username={username}
-            password={password}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            handleSubmit={handleLogin}
-          />
+          <LoginForm handleLogin={handleLogin} />
         </Togglable>
       }
 
@@ -174,15 +148,7 @@ const App = () => {
           </button>
 
           <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
-            <BlogForm
-              title={title}
-              author={author}
-              url={url}
-              handleTitleChange={({ target }) => setTitle(target.value)}
-              handleAuthorChange={({ target }) => setAuthor(target.value)}
-              handleUrlChange={({ target }) => setUrl(target.value)}
-              handleSubmit={handleCreateBlog}
-            />
+            <BlogForm handleCreateBlog={handleCreateBlog} />
           </Togglable>
 
           <h2>Blogs</h2>
