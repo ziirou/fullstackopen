@@ -129,6 +129,23 @@ const App = () => {
     }
   }
 
+  const handleBlogLike = async (id) => {
+    const blog = blogs.find(blog => blog.id === id)
+    const editedBlog = { ...blog, likes: (blog.likes + 1) }
+
+    try {
+      const returnedBlog = await blogService.update(id, editedBlog)
+      setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+    } catch(exception) {
+      console.log('Blog editing failed:', exception)
+
+      handleNotification(
+        `Blog editing failed: ${exception.response.data.error || exception.status}`,
+        'error', 5000
+      )
+    }
+  }
+
   return (
     <div>
       <Notification notification={notification} />
@@ -153,7 +170,11 @@ const App = () => {
 
           <h2>Blogs</h2>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              handleBlogLike={handleBlogLike}
+            />
           )}
         </div>
       }
