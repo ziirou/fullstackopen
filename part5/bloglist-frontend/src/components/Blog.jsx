@@ -5,25 +5,14 @@ const Blog = ({ blog, handleBlogLike }) => {
 
   return (
     <div className='blog'>
-      {!showDetails &&
-        <div>
-          {blog.title} - {blog.author}
-          <button className='blog_button'
-            onClick={() => setShowDetails(true)}>
-            View
-          </button>
-        </div>
-      }
+      {blog.title} - {blog.author}
+      <button className='blog_button'
+        onClick={() => setShowDetails(!showDetails)}>
+        {showDetails ? 'Hide' : 'View' }
+      </button>
 
       {showDetails &&
         <div>
-          <div>
-            {blog.title} - {blog.author}
-            <button className='blog_button'
-              onClick={() => setShowDetails(false)}>
-              Hide
-            </button>
-          </div>
           <div>URL: {blog.url}</div>
           <div>
             Likes: {blog.likes}
