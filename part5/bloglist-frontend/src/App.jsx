@@ -134,8 +134,10 @@ const App = () => {
     const editedBlog = { ...blog, likes: (blog.likes + 1) }
 
     try {
-      const returnedBlog = await blogService.update(id, editedBlog)
-      setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
+      await blogService.update(id, editedBlog)
+      /* Blog component needs other user information
+          in addition to user id, so let's not use the returned blog. */
+      setBlogs(blogs.map(blog => blog.id !== id ? blog : editedBlog))
     } catch(exception) {
       console.log('Blog editing failed:', exception)
 

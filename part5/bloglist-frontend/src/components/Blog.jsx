@@ -32,7 +32,7 @@ const Blog = ({ blog, handleBlogLike }) => {
               Like
             </button>
           </div>
-          {blog.user &&
+          {blog.user && blog.user.name &&
             <div>User: {blog.user.name}</div>
           }
         </div>
