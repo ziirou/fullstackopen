@@ -129,15 +129,14 @@ const App = () => {
     }
   }
 
-  const handleBlogLike = async (id) => {
-    const blog = blogs.find(blog => blog.id === id)
-    const editedBlog = { ...blog, likes: (blog.likes + 1) }
+  const handleBlogLike = async (blogObject) => {
+    const editedBlog = { ...blogObject, likes: (blogObject.likes + 1) }
 
     try {
-      await blogService.update(id, editedBlog)
+      await blogService.update(editedBlog)
       /* Blog component needs other user information
           in addition to user id, so let's not use the returned blog. */
-      setBlogs(blogs.map(blog => blog.id !== id ? blog : editedBlog))
+      setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : editedBlog))
     } catch(exception) {
       console.log('Blog editing failed:', exception)
 
