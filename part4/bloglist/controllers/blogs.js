@@ -36,7 +36,7 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
     return response.status(204).end()
   }
 
-  if (blog.user.toString() === user._id.toString()) {
+  if (!blog.user || blog.user.toString() === user._id.toString()) {
     await Blog.deleteOne(blog)
     response.status(204).end()
   } else {

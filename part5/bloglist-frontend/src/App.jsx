@@ -35,7 +35,8 @@ const App = () => {
         console.log(exception)
 
         handleNotification(
-          `Fetching blogs failed: ${exception.response.data.error || exception.status}`,
+          `Fetching blogs failed:
+            ${exception.response.data.error || `status code: ${exception.status}`}`,
           'error', 5000
         )
       }
@@ -74,7 +75,8 @@ const App = () => {
       console.log('Login failed:', exception)
 
       handleNotification(
-        `Login failed: ${exception.response.data.error || exception.status}`,
+        `Login failed:
+          ${exception.response.data.error || `status code: ${exception.status}`}`,
         'error', 5000
       )
     }
@@ -95,13 +97,14 @@ const App = () => {
       console.log('Logout failed:', exception)
 
       handleNotification(
-        `Logout failed: ${exception.response.data.error || exception.status}`,
+        `Logout failed:
+          ${exception.response.data.error || `status code: ${exception.status}`}`,
         'error', 5000
       )
     }
   }
 
-  const handleCreateBlog = async (blogObject) => {
+  const handleBlogCreate = async (blogObject) => {
     try {
       const createdBlog = await blogService.create(blogObject)
 
@@ -124,7 +127,33 @@ const App = () => {
       console.log('Blog creation failed:', exception)
 
       handleNotification(
-        `Blog creation failed: ${exception.response.data.error || exception.status}`,
+        `Blog creation failed:
+          ${exception.response.data.error || `status code: ${exception.status}`}`,
+        'error', 5000
+      )
+    }
+  }
+
+  const handleBlogRemove = async (blogObject) => {
+    if (!confirm(`Remove blog '${blogObject.title}' by '${blogObject.author}'?`)) {
+      return
+    }
+
+    try {
+      await blogService.remove(blogObject.id)
+
+      setBlogs(blogs => blogs.filter(blog => blog.id !== blogObject.id))
+
+      handleNotification(
+        `Blog '${blogObject.title}' successfully removed`,
+        'notification', 5000
+      )
+    } catch(exception) {
+      console.log('Blog removing failed:', exception)
+
+      handleNotification(
+        `Blog removing failed:
+          ${exception.response.data.error || `status code: ${exception.status}`}`,
         'error', 5000
       )
     }
@@ -144,7 +173,8 @@ const App = () => {
       console.log('Blog editing failed:', exception)
 
       handleNotification(
-        `Blog editing failed: ${exception.response.data.error || exception.status}`,
+        `Blog editing failed:
+          ${exception.response.data.error || `status code: ${exception.status}`}`,
         'error', 5000
       )
     }
@@ -169,7 +199,7 @@ const App = () => {
           </button>
 
           <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
-            <BlogForm handleCreateBlog={handleCreateBlog} />
+            <BlogForm handleBlogCreate={handleBlogCreate} />
           </Togglable>
 
           <h2>Blogs</h2>
@@ -178,6 +208,7 @@ const App = () => {
               key={blog.id}
               blog={blog}
               handleBlogLike={handleBlogLike}
+              handleBlogRemove={handleBlogRemove}
             />
           )}
         </div>
