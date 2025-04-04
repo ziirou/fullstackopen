@@ -90,6 +90,22 @@ describe('Blog app', () => {
         await expect(page.getByText('Blog editing failed')).not.toBeVisible()
         await expect(page.getByText('Likes: 1')).toBeVisible()
       })
+
+      test('A blog can be removed', async ({ page }) => {
+        await page.getByRole('button', { name: 'View' }).click()
+        page.on('dialog', async dialog => {
+          await dialog.accept()
+        })
+        await page.getByRole('button', { name: 'Remove' }).click()
+
+        await expect(page.getByText('test blog - test author')).not.toBeVisible()
+
+        const notifDiv = page.locator('.notification')
+        await expect(notifDiv).toContainText('Blog \'test blog\' successfully removed')
+        await expect(notifDiv).toHaveCSS('border-style', 'solid')
+        await expect(notifDiv).toHaveCSS('color', 'rgb(0, 128, 0)')
+        await expect(page.getByText('Blog removing failed')).not.toBeVisible()
+      })
     })
   })
 })

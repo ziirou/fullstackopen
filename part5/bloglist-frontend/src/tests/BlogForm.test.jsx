@@ -19,7 +19,6 @@ describe('<BlogForm />', () => {
     await user.type(urlInput, 'test_url')
     await user.click(createButton)
 
-    console.log(handleBlogCreate.mock.calls)
     expect(handleBlogCreate.mock.calls).toHaveLength(1)
     expect(handleBlogCreate.mock.calls[0][0].title).toBe('test title')
     expect(handleBlogCreate.mock.calls[0][0].author).toBe('test author')
