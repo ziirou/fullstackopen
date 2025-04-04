@@ -116,7 +116,7 @@ describe('When there is initially some blogs saved', () => {
       assert.strictEqual(typeof addedBlog.url, 'string')
       assert.strictEqual(typeof addedBlog.likes, 'number')
       assert.strictEqual(typeof addedBlog.id, 'string')
-      assert.strictEqual(typeof addedBlog.user, 'string')
+      assert.strictEqual(typeof addedBlog.user, 'object')
 
       delete addedBlog.id
       delete addedBlog.user
