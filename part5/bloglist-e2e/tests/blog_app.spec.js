@@ -47,4 +47,27 @@ describe('Blog app', () => {
       await expect(page.getByText('logged in')).not.toBeVisible()
     })
   })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await loginWith(page, 'testuser', 'test_password')
+    })
+
+    test('A new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'Create new blog' }).click()
+      await page.getByRole('textbox', { name: 'Title' }).fill('test blog')
+      await page.getByRole('textbox', { name: 'Author' }).fill('test author')
+      await page.getByRole('textbox', { name: 'URL' }).fill('test_url')
+      await page.getByRole('button', { name: 'Create' }).click()
+
+      const notifDiv = page.locator('.notification')
+      await expect(notifDiv)
+        .toContainText('New blog created: \'test blog by test author\'')
+      await expect(notifDiv).toHaveCSS('border-style', 'solid')
+      await expect(notifDiv).toHaveCSS('color', 'rgb(0, 128, 0)')
+      await expect(page.getByText('Blog creation failed')).not.toBeVisible()
+
+      await expect(page.getByText('test blog - test author')).toBeVisible()
+    })
+  })
 })
