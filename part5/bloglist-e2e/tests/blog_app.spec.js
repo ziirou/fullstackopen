@@ -11,6 +11,13 @@ describe('Blog app', () => {
         password: 'test_password'
       }
     })
+    await request.post('/api/users', {
+      data: {
+        name: 'Other User',
+        username: 'other_user',
+        password: 'other_password'
+      }
+    })
 
     await page.goto('/')
   })
@@ -105,6 +112,17 @@ describe('Blog app', () => {
         await expect(notifDiv).toHaveCSS('border-style', 'solid')
         await expect(notifDiv).toHaveCSS('color', 'rgb(0, 128, 0)')
         await expect(page.getByText('Blog removing failed')).not.toBeVisible()
+      })
+
+      test('Non-creator can\t see the remove button', async ({ page }) => {
+        await page.getByRole('button', { name: 'View' }).click()
+        await expect(page.getByRole('button', { name: 'Remove' })).toBeVisible()
+
+        await page.getByRole('button', { name: 'Logout' }).click()
+        await loginWith(page, 'other_user', 'other_password')
+
+        await page.getByRole('button', { name: 'View' }).click()
+        await expect(page.getByRole('button', { name: 'Remove' })).not.toBeVisible()
       })
     })
   })
