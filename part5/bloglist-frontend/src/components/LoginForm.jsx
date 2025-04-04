@@ -25,6 +25,7 @@ const LoginForm = ({ handleLogin }) => {
         <div>
           Username:
           <input className='login'
+            data-testid='username'
             value={username}
             onChange={event => setUsername(event.target.value)}
           />
@@ -32,6 +33,7 @@ const LoginForm = ({ handleLogin }) => {
         <div>
           Password:
           <input className='login'
+            data-testid='password'
             type="password"
             value={password}
             onChange={event => setPassword(event.target.value)}
