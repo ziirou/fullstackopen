@@ -1,5 +1,5 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-const { loginWith, createBlog } = require('./helper')
+const { loginWith, createBlog, likeBlog } = require('./helper')
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
@@ -111,8 +111,7 @@ describe('Blog app', () => {
 
       test('A blog can be liked', async ({ page }) => {
         const firstBlog = page.locator('.blog').getByText('first blog - first author')
-        await firstBlog.getByRole('button', { name: 'View' }).click()
-        await firstBlog.getByRole('button', { name: 'Like' }).click()
+        await likeBlog(firstBlog, 1)
 
         await expect(firstBlog.getByText('Blog editing failed')).not.toBeVisible()
         await expect(firstBlog.getByText('Likes: 1')).toBeVisible()
@@ -145,6 +144,25 @@ describe('Blog app', () => {
 
         await firstBlog.getByRole('button', { name: 'View' }).click()
         await expect(firstBlog.getByRole('button', { name: 'Remove' })).not.toBeVisible()
+      })
+
+      test('Blogs are sorted by likes', async ({ page }) => {
+        const blogDiv = page.locator('.blog')
+
+        const firstBlog = blogDiv.getByText('first blog - first author')
+        await likeBlog(firstBlog, 1)
+
+        const secondBlog = blogDiv.getByText('second blog - second author')
+        await likeBlog(secondBlog, 2)
+
+        const thirdBlog = blogDiv.getByText('third blog - third author')
+        await likeBlog(thirdBlog, 3)
+
+        const blogs = await page.locator('.blog').all()
+
+        await expect(blogs[0]).toContainText('third blog')
+        await expect(blogs[1]).toContainText('second blog')
+        await expect(blogs[2]).toContainText('first blog')
       })
     })
   })
