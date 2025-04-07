@@ -79,50 +79,72 @@ describe('Blog app', () => {
       await expect(page.getByText('test blog - test author')).toBeVisible()
     })
 
-    describe('When one blog exists', () => {
+    describe('When several blogs exist', () => {
       beforeEach(async ({ page }) => {
-        const blog = {
-          title: 'test blog',
-          author: 'test author',
-          url: 'test_url'
+        const first_blog = {
+          title: 'first blog',
+          author: 'first author',
+          url: 'first_url'
+        }
+        const second_blog = {
+          title: 'second blog',
+          author: 'second author',
+          url: 'second_url'
+        }
+        const third_blog = {
+          title: 'third blog',
+          author: 'third author',
+          url: 'third_url'
         }
 
-        await createBlog(page, blog)
+        await createBlog(page, first_blog)
+        await createBlog(page, second_blog)
+        await createBlog(page, third_blog)
+      })
+
+      test('All of them exist', async ({ page }) => {
+        const blogDiv = page.locator('.blog')
+        await expect(blogDiv.getByText('first blog - first author')).toBeVisible()
+        await expect(blogDiv.getByText('second blog - second author')).toBeVisible()
+        await expect(blogDiv.getByText('third blog - third author')).toBeVisible()
       })
 
       test('A blog can be liked', async ({ page }) => {
-        await page.getByRole('button', { name: 'View' }).click()
-        await page.getByRole('button', { name: 'Like' }).click()
+        const firstBlog = page.locator('.blog').getByText('first blog - first author')
+        await firstBlog.getByRole('button', { name: 'View' }).click()
+        await firstBlog.getByRole('button', { name: 'Like' }).click()
 
-        await expect(page.getByText('Blog editing failed')).not.toBeVisible()
-        await expect(page.getByText('Likes: 1')).toBeVisible()
+        await expect(firstBlog.getByText('Blog editing failed')).not.toBeVisible()
+        await expect(firstBlog.getByText('Likes: 1')).toBeVisible()
       })
 
       test('A blog can be removed', async ({ page }) => {
-        await page.getByRole('button', { name: 'View' }).click()
+        const firstBlog = page.locator('.blog').getByText('first blog - first author')
+        await firstBlog.getByRole('button', { name: 'View' }).click()
         page.on('dialog', async dialog => {
           await dialog.accept()
         })
-        await page.getByRole('button', { name: 'Remove' }).click()
+        await firstBlog.getByRole('button', { name: 'Remove' }).click()
 
-        await expect(page.getByText('test blog - test author')).not.toBeVisible()
+        await expect(firstBlog.getByText('first blog - first author')).not.toBeVisible()
 
         const notifDiv = page.locator('.notification')
-        await expect(notifDiv).toContainText('Blog \'test blog\' successfully removed')
+        await expect(notifDiv).toContainText('Blog \'first blog\' successfully removed')
         await expect(notifDiv).toHaveCSS('border-style', 'solid')
         await expect(notifDiv).toHaveCSS('color', 'rgb(0, 128, 0)')
         await expect(page.getByText('Blog removing failed')).not.toBeVisible()
       })
 
       test('Non-creator can\t see the remove button', async ({ page }) => {
-        await page.getByRole('button', { name: 'View' }).click()
-        await expect(page.getByRole('button', { name: 'Remove' })).toBeVisible()
+        const firstBlog = page.locator('.blog').getByText('first blog - first author')
+        await firstBlog.getByRole('button', { name: 'View' }).click()
+        await expect(firstBlog.getByRole('button', { name: 'Remove' })).toBeVisible()
 
         await page.getByRole('button', { name: 'Logout' }).click()
         await loginWith(page, 'other_user', 'other_password')
 
-        await page.getByRole('button', { name: 'View' }).click()
-        await expect(page.getByRole('button', { name: 'Remove' })).not.toBeVisible()
+        await firstBlog.getByRole('button', { name: 'View' }).click()
+        await expect(firstBlog.getByRole('button', { name: 'Remove' })).not.toBeVisible()
       })
     })
   })
