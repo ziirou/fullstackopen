@@ -1,5 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+// Variable to store the timeout ID
+let timeoutId
+
 const notificationSlice = createSlice({
   name: 'notification',
   initialState: { message: '', id: null },
@@ -33,11 +36,18 @@ const {
 
 export const setNotification = (message, seconds) => {
   return async dispatch => {
+    // Clear any existing timeout
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+
      // Generate a unique ID for the notification
     const id = Date.now()
 
     dispatch(showNotification({ message, id }))
-    setTimeout(() => {
+
+    // Set a new timeout and store its ID
+    timeoutId = setTimeout(() => {
       dispatch(clearNotification(id))
     }, seconds * 1000)
   }
