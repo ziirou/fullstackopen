@@ -1,14 +1,13 @@
 const AnecdoteForm = () => {
-
   const onCreate = (event) => {
     event.preventDefault()
     const content = event.target.anecdote.value
     event.target.anecdote.value = ''
-    console.log('new anecdote')
-}
+    console.log('new anecdote:', content)
+  }
 
   return (
-    <div>
+    <div style={{ marginBottom: '10px' }}>
       <h3>create new</h3>
       <form onSubmit={onCreate}>
         <input name='anecdote' />
