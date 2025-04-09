@@ -1,6 +1,6 @@
 import {
   Routes, Route, Link, Navigate,
-  useMatch
+  useMatch, useNavigate
 } from 'react-router-dom'
 import { useState } from 'react'
 
@@ -52,6 +52,27 @@ const About = () => (
   </div>
 )
 
+const Notification = ({ notification }) => {
+  if (!notification) {
+    return null
+  }
+
+  const style = {
+    backgroundColor: 'aliceblue',
+    border: 'solid',
+    padding: 10,
+    borderWidth: 1,
+    marginTop: 5,
+    marginBottom: 5
+  }
+
+  return (
+    <div style={style}>
+      {notification}
+    </div>
+  )
+}
+
 const Footer = () => (
   <div>
     Anecdote app for <a href='https://fullstackopen.com/'>Full Stack Open</a>.
@@ -64,16 +85,17 @@ const CreateNew = (props) => {
   const [content, setContent] = useState('')
   const [author, setAuthor] = useState('')
   const [info, setInfo] = useState('')
+  const navigate = useNavigate()
 
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = (event) => {
+    event.preventDefault()
     props.addNew({
       content,
       author,
       info,
       votes: 0
     })
+    navigate('/')
   }
 
   return (
@@ -82,15 +104,15 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input name='content' value={content} onChange={(event) => setContent(event.target.value)} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input name='author' value={author} onChange={(event) => setAuthor(event.target.value)} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input name='info' value={info} onChange={(event)=> setInfo(event.target.value)} />
         </div>
         <button>create</button>
       </form>
@@ -122,6 +144,10 @@ const App = () => {
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    setNotification(`'a new anecdote '${anecdote.content}' created!'`)
+    setTimeout(() => {
+      setNotification('')
+    }, 5000)
   }
 
   const anecdoteById = (id) =>
@@ -147,6 +173,7 @@ const App = () => {
     <div>
       <h1>Software anecdotes</h1>
       <Menu />
+      <Notification notification={notification} />
       <Routes>
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path="/anecdotes" element={<Navigate replace to="/" />} />
