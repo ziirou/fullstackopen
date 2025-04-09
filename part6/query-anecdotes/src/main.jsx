@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
-import { NotifContextProvider } from './NotifContext'
+import { NotifContextProvider } from './context/NotifContext'
 
 const queryClient = new QueryClient()
 

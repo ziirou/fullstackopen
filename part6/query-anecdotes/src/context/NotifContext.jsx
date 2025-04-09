@@ -1,4 +1,4 @@
-import { createContext, useReducer, useContext } from 'react'
+import { createContext, useReducer } from 'react'
 import PropTypes from 'prop-types'
 
 const notificationReducer = (state, action) => {
@@ -22,16 +22,6 @@ export const NotifContextProvider = (props) => {
       {props.children}
     </NotifContext.Provider>
   )
-}
-
-export const useNotification = () => {
-  const notifAndDispatch = useContext(NotifContext)
-  return notifAndDispatch[0]
-}
-
-export const useNotifDispatch = () => {
-  const notifAndDispatch = useContext(NotifContext)
-  return notifAndDispatch[1]
 }
 
 NotifContextProvider.propTypes = {
