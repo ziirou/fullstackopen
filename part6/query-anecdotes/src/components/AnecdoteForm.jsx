@@ -11,6 +11,13 @@ const AnecdoteForm = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anecdotes'] })
     },
+    onError: (error) => {
+      console.log('error:', error)
+      notifDispatch({ type: 'SET', payload: `${error.response.data.error}` })
+      setTimeout(() => {
+        notifDispatch({ type: 'CLEAR', payload: '' })
+      }, 5000)
+    },
   })
 
   const onCreate = (event) => {
