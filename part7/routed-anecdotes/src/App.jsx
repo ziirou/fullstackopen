@@ -3,6 +3,8 @@ import {
   useMatch, useNavigate
 } from 'react-router-dom'
 import { useState } from 'react'
+import PropTypes from 'prop-types'
+import { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
@@ -17,26 +19,38 @@ const Menu = () => {
   )
 }
 
-const Anecdote = ({ anecdote }) => (
-  <div>
-    <h2>{anecdote.content}</h2>
-    <p>has {anecdote.votes} votes</p>
-    <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
-  </div>
-)
+const Anecdote = ({ anecdote }) => {
+  Anecdote.propTypes = {
+    anecdote: PropTypes.object.isRequired,
+  }
 
-const AnecdoteList = ({ anecdotes }) => (
-  <div>
-    <h2>Anecdotes</h2>
-    <ul>
-      {anecdotes.map(anecdote =>
-        <li key={anecdote.id} >
-          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
-        </li>
-      )}
-    </ul>
-  </div>
-)
+  return (
+    <div>
+      <h2>{anecdote.content}</h2>
+      <p>has {anecdote.votes} votes</p>
+      <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
+    </div>
+  )
+}
+
+const AnecdoteList = ({ anecdotes }) => {
+  AnecdoteList.propTypes = {
+    anecdotes: PropTypes.array.isRequired,
+  }
+
+  return (
+    <div>
+      <h2>Anecdotes</h2>
+      <ul>
+        {anecdotes.map(anecdote =>
+          <li key={anecdote.id} >
+            <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+          </li>
+        )}
+      </ul>
+    </div>
+  )
+}
 
 const About = () => (
   <div>
@@ -46,13 +60,17 @@ const About = () => (
     <em>An anecdote is a brief, revealing account of an individual person or an incident.
       Occasionally humorous, anecdotes differ from jokes because their primary purpose is not simply to provoke laughter but to reveal a truth more general than the brief tale itself,
       such as to characterize a person by delineating a specific quirk or trait, to communicate an abstract idea about a person, place, or thing through the concrete details of a short narrative.
-      An anecdote is "a story with a point."</em>
+      An anecdote is &quot;a story with a point.&quot;</em>
 
     <p>Software engineering is full of excellent anecdotes, at this app you can find the best and add more.</p>
   </div>
 )
 
 const Notification = ({ notification }) => {
+  Notification.propTypes = {
+    notification: PropTypes.string.isRequired,
+  }
+
   if (!notification) {
     return null
   }
@@ -77,22 +95,26 @@ const Footer = () => (
   <div>
     Anecdote app for <a href='https://fullstackopen.com/'>Full Stack Open</a>.
 
-    See <a href='https://github.com/fullstack-hy2020/routed-anecdotes/blob/main/src/App.jsx'>https://github.com/fullstack-hy2020/routed-anecdotes/blob/main/src/App.jsx</a> for the source code.
+    See <a href='https://github.com/fullstack-hy2020/routed-anecdotes/blob/main/src/App.jsx'>https://github.com/fullstack-hy2020/routed-anecdotes/blob/main/src/App.jsx</a> for the example source code.
   </div>
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  CreateNew.propTypes = {
+    addNew: PropTypes.func.isRequired,
+  }
+
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
   const navigate = useNavigate()
 
   const handleSubmit = (event) => {
     event.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
     navigate('/')
@@ -104,15 +126,15 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(event) => setContent(event.target.value)} />
+          <input {...content} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(event) => setAuthor(event.target.value)} />
+          <input {...author} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(event)=> setInfo(event.target.value)} />
+          <input {...info} />
         </div>
         <button>create</button>
       </form>
@@ -177,7 +199,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
         <Route path="/anecdotes" element={<Navigate replace to="/" />} />
-        <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
+        {anecdote &&
+          <Route path="/anecdotes/:id" element={<Anecdote anecdote={anecdote} />} />
+        }
         <Route path="/create" element={<CreateNew addNew={addNew} />} />
         <Route path="/about" element={<About />} />
       </Routes>
