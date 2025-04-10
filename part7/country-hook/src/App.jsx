@@ -18,7 +18,34 @@ const useField = (type) => {
 const useCountry = (name) => {
   const [country, setCountry] = useState(null)
 
-  useEffect(() => {})
+  useEffect(() => {
+    if (!name) {
+      setCountry(null)
+      return
+    }
+
+    const fetchData = async () => {
+      try {
+        const countryName = name.toLowerCase()
+        const response = await axios
+          .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${countryName}`)
+        setCountry({ 
+          found: true, 
+          data: {
+            name: response.data.name.common,
+            capital: response.data.capital[0],
+            population: response.data.population,
+            flag: response.data.flags.png,
+          }
+        })
+      } catch (exception) {
+        console.log('error:', exception)
+        setCountry({ found: false })
+      }
+    }
+
+    fetchData()
+  }, [name])
 
   return country
 }
@@ -36,12 +63,18 @@ const Country = ({ country }) => {
     )
   }
 
+  const flagStyle = {
+    height: '100px',
+    border: '1px solid black',
+    marginTop: '10px',
+  }
+
   return (
     <div>
-      <h3>{country.data.name} </h3>
-      <div>capital {country.data.capital} </div>
-      <div>population {country.data.population}</div> 
-      <img src={country.data.flag} height='100' alt={`flag of ${country.data.name}`}/>  
+      <h3>{country.data.name}</h3>
+      <div>capital: {country.data.capital}</div>
+      <div>population: {country.data.population}</div>
+      <img style={flagStyle} src={country.data.flag} alt={`flag of ${country.data.name}`}/>
     </div>
   )
 }
