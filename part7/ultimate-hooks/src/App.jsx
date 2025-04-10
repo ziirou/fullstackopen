@@ -18,10 +18,32 @@ const useField = (type) => {
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
-  // ...
+  useEffect(() => {
+    if (!baseUrl) {
+      setResources(null)
+      return
+    }
 
-  const create = (resource) => {
-    // ...
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(baseUrl)
+        setResources(response.data)
+      } catch (exception) {
+        console.log('error:', exception)
+        setResources(null)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  const create = async (resource) => {
+    try {
+      const response = await axios.post(baseUrl, resource)
+      setResources(resources.concat(response.data))
+    } catch (exception) {
+      console.log('error:', exception)
+    }
   }
 
   const service = {
@@ -66,7 +88,7 @@ const App = () => {
         number <input {...number} />
         <button>create</button>
       </form>
-      {persons.map(n => <p key={n.id}>{n.name} {n.number}</p>)}
+      {persons.map(p => <p key={p.id}>{p.name} {p.number}</p>)}
     </div>
   )
 }
