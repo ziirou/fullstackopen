@@ -1,5 +1,9 @@
-const Notification = ({ notification }) => {
-  if (notification === null) {
+import { useNotification } from '../context/NotifHooks'
+
+const Notification = () => {
+  const notification = useNotification()
+
+  if (!notification) {
     return null
   }
 

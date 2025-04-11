@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -9,22 +9,30 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+import { useNotifDispatch } from './context/NotifHooks'
+
 const App = () => {
-  const [notification, setNotification] = useState(null)
+  const notifDispatch = useNotifDispatch()
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
 
-  const handleNotification = (message, type, timeout) => {
-    setNotification({
-      message: message,
-      type: type,
-    })
-    setTimeout(() => {
-      setNotification(null)
-    }, timeout)
-  }
+  const handleNotification = useCallback(
+    (message, notifType, timeout) => {
+      notifDispatch({
+        type: 'SET',
+        payload: {
+          message: message,
+          type: notifType,
+        },
+      })
+      setTimeout(() => {
+        notifDispatch({ type: 'CLEAR', payload: '' })
+      }, timeout)
+    },
+    [notifDispatch]
+  )
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -49,7 +57,7 @@ const App = () => {
     }
 
     fetchBlogs()
-  }, [])
+  }, [handleNotification])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
@@ -211,7 +219,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification notification={notification} />
+      <Notification />
 
       {!user && (
         <Togglable buttonLabel="Log in">
