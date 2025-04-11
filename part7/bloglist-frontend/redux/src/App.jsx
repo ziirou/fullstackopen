@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -11,10 +11,11 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs, createBlog } from './reducers/blogReducer'
 
 const App = () => {
   const dispatch = useDispatch()
-  const [blogs, setBlogs] = useState([])
+  const blogs = useSelector((state) => state.blogs)
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
@@ -29,10 +30,7 @@ const App = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const fetchedBlogs = await blogService.getAll()
-        setBlogs(
-          [...fetchedBlogs].sort((less, more) => more.likes - less.likes)
-        )
+        dispatch(initializeBlogs())
       } catch (exception) {
         console.log(exception)
 
@@ -49,7 +47,7 @@ const App = () => {
     }
 
     fetchBlogs()
-  }, [handleNotification])
+  }, [dispatch, handleNotification])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
@@ -119,21 +117,19 @@ const App = () => {
 
   const handleBlogCreate = async (blogObject) => {
     try {
-      const createdBlog = await blogService.create(blogObject)
+      dispatch(createBlog(blogObject))
 
       blogFormRef.current.toggleVisibility()
-      /* No need to sort here as the new one goes to the bottom. */
-      setBlogs(blogs.concat(createdBlog))
 
-      if (createdBlog.author) {
+      if (blogObject.author) {
         handleNotification(
-          `New blog created: '${createdBlog.title} by ${createdBlog.author}'`,
+          `New blog created: '${blogObject.title} by ${blogObject.author}'`,
           'notification',
           5000
         )
       } else {
         handleNotification(
-          `New blog '${createdBlog.title}' created without an author`,
+          `New blog '${blogObject.title}' created without an author`,
           'warning',
           5000
         )
@@ -162,7 +158,7 @@ const App = () => {
     try {
       await blogService.remove(blogObject.id)
 
-      setBlogs((blogs) => blogs.filter((blog) => blog.id !== blogObject.id))
+      //setBlogs((blogs) => blogs.filter((blog) => blog.id !== blogObject.id))
 
       handleNotification(
         `Blog '${blogObject.title}' successfully removed`,
@@ -190,11 +186,11 @@ const App = () => {
       await blogService.update(editedBlog)
       /* Blog component needs other user information
           in addition to user id, so let's not use the returned blog. */
-      setBlogs(
+      /*setBlogs(
         [...blogs]
           .map((blog) => (blog.id !== blogObject.id ? blog : editedBlog))
           .sort((less, more) => more.likes - less.likes)
-      )
+      )*/
     } catch (exception) {
       console.log('Blog editing failed:', exception)
 
