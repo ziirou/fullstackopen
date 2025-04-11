@@ -36,5 +36,6 @@ module.exports = {
     'no-console': 'off',
     'react/react-in-jsx-scope': 'off',
     'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    'max-len': ['warn', { code: 80 }],
   },
 }

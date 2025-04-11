@@ -37,8 +37,11 @@ const App = () => {
         console.log(exception)
 
         handleNotification(
-          `Fetching blogs failed:
-            ${exception.response.data.error || `status code: ${exception.status}`}`,
+          'Fetching blogs failed: ' +
+            `${
+              exception.response.data.error ||
+              `status code: ${exception.status}`
+            }`,
           'error',
           5000
         )
@@ -78,8 +81,10 @@ const App = () => {
       console.log('Login failed:', exception)
 
       handleNotification(
-        `Login failed:
-          ${exception.response.data.error || `status code: ${exception.status}`}`,
+        'Login failed: ' +
+          `${
+            exception.response.data.error || `status code: ${exception.status}`
+          }`,
         'error',
         5000
       )
@@ -102,8 +107,10 @@ const App = () => {
       console.log('Logout failed:', exception)
 
       handleNotification(
-        `Logout failed:
-          ${exception.response.data.error || `status code: ${exception.status}`}`,
+        'Logout failed: ' +
+          `${
+            exception.response.data.error || `status code: ${exception.status}`
+          }`,
         'error',
         5000
       )
@@ -135,8 +142,10 @@ const App = () => {
       console.log('Blog creation failed:', exception)
 
       handleNotification(
-        `Blog creation failed:
-          ${exception.response.data.error || `status code: ${exception.status}`}`,
+        'Blog creation failed: ' +
+          `${
+            exception.response.data.error || `status code: ${exception.status}`
+          }`,
         'error',
         5000
       )
@@ -164,8 +173,10 @@ const App = () => {
       console.log('Blog removing failed:', exception)
 
       handleNotification(
-        `Blog removing failed:
-          ${exception.response.data.error || `status code: ${exception.status}`}`,
+        'Blog removing failed: ' +
+          `${
+            exception.response.data.error || `status code: ${exception.status}`
+          }`,
         'error',
         5000
       )
@@ -188,8 +199,10 @@ const App = () => {
       console.log('Blog editing failed:', exception)
 
       handleNotification(
-        `Blog editing failed:
-          ${exception.response.data.error || `status code: ${exception.status}`}`,
+        'Blog editing failed: ' +
+          `${
+            exception.response.data.error || `status code: ${exception.status}`
+          }`,
         'error',
         5000
       )

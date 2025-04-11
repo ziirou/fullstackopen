@@ -137,26 +137,30 @@ describe('When there is initially one user at db', () => {
       assert(response.body.error.includes('password is too short'))
     })
 
-    test('Fails with proper status code and message if username already taken', async () => {
-      const usersAtStart = await testHelper.usersInDb()
+    test(
+      'Fails with proper status code and message ' +
+        'if username already taken',
+      async () => {
+        const usersAtStart = await testHelper.usersInDb()
 
-      const newUser = {
-        username: 'initial_user',
-        name: 'Initial User',
-        password: 'secret_password',
+        const newUser = {
+          username: 'initial_user',
+          name: 'Initial User',
+          password: 'secret_password',
+        }
+
+        const response = await api
+          .post('/api/users')
+          .send(newUser)
+          .expect(400)
+          .expect('Content-Type', /application\/json/)
+
+        const usersAtEnd = await testHelper.usersInDb()
+
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+        assert(response.body.error.includes('expected `username` to be unique'))
       }
-
-      const response = await api
-        .post('/api/users')
-        .send(newUser)
-        .expect(400)
-        .expect('Content-Type', /application\/json/)
-
-      const usersAtEnd = await testHelper.usersInDb()
-
-      assert.strictEqual(usersAtEnd.length, usersAtStart.length)
-      assert(response.body.error.includes('expected `username` to be unique'))
-    })
+    )
   })
 })
 

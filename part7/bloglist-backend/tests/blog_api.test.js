@@ -244,17 +244,13 @@ describe('When there is initially some blogs saved', () => {
     test('Fails with status code 400 if id is invalid', async () => {
       const invalidId = '67e3a3b9b5d42fe75af929'
 
-      await api
-        .put(`/api/blogs/${invalidId}`)
-        .expect(400)
+      await api.put(`/api/blogs/${invalidId}`).expect(400)
     })
 
     test('Fails with status code 404 if id is missing', async () => {
       const missingId = '67e41aa5c7dac7fedfabf18b'
 
-      await api
-        .put(`/api/blogs/${missingId}`)
-        .expect(404)
+      await api.put(`/api/blogs/${missingId}`).expect(404)
     })
 
     test('Fails with status code 400 if data invalid', async () => {
