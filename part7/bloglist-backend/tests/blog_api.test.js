@@ -231,7 +231,6 @@ describe('When there is initially some blogs saved', () => {
 
       const response = await api
         .put(`/api/blogs/${idBlogToEdit}`)
-        .set({ Authorization: `Bearer ${token}` })
         .send(editedBlog)
         .expect(200)
         .expect('Content-Type', /application\/json/)
@@ -247,7 +246,6 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${invalidId}`)
-        .set({ Authorization: `Bearer ${token}` })
         .expect(400)
     })
 
@@ -256,7 +254,6 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${missingId}`)
-        .set({ Authorization: `Bearer ${token}` })
         .expect(404)
     })
 
@@ -272,7 +269,6 @@ describe('When there is initially some blogs saved', () => {
 
       const response = await api
         .put(`/api/blogs/${idBlogToEdit}`)
-        .set({ Authorization: `Bearer ${token}` })
         .send(editedBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)
