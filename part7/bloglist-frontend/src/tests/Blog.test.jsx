@@ -25,7 +25,7 @@ describe('<Blog />', () => {
       likes: 100,
       user: {
         username: 'test_user',
-        name: 'Test User'
+        name: 'Test User',
       },
     }
 

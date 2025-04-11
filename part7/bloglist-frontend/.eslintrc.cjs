@@ -3,7 +3,7 @@ module.exports = {
   env: {
     browser: true,
     es2020: true,
-    "vitest-globals/env": true
+    'vitest-globals/env': true,
   },
   extends: [
     'eslint:recommended',
@@ -11,6 +11,7 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
     'plugin:vitest-globals/recommended',
+    'prettier', // Make sure this is the last
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
@@ -24,13 +25,13 @@ module.exports = {
     'react/prop-types': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
-    'eqeqeq': 'error',
+    eqeqeq: 'error',
     'no-trailing-spaces': 'error',
     'object-curly-spacing': ['error', 'always'],
     'arrow-spacing': ['error', { before: true, after: true }],
-    'indent': ['error', 2],
-    'quotes': ['error', 'single'],
-    'semi': ['error', 'never'],
+    indent: ['error', 2],
+    quotes: ['error', 'single'],
+    semi: ['error', 'never'],
     'linebreak-style': ['error', 'unix'],
     'no-console': 'off',
     'react/react-in-jsx-scope': 'off',

@@ -30,7 +30,7 @@ const BlogForm = ({ handleBlogCreate }) => {
             type="text"
             value={title}
             aria-label="Title"
-            onChange={event => setTitle(event.target.value)}
+            onChange={(event) => setTitle(event.target.value)}
           />
         </div>
         <div>
@@ -39,7 +39,7 @@ const BlogForm = ({ handleBlogCreate }) => {
             type="text"
             value={author}
             aria-label="Author"
-            onChange={event => setAuthor(event.target.value)}
+            onChange={(event) => setAuthor(event.target.value)}
           />
         </div>
         <div>
@@ -48,7 +48,7 @@ const BlogForm = ({ handleBlogCreate }) => {
             type="text"
             value={url}
             aria-label="URL"
-            onChange={event => setUrl(event.target.value)}
+            onChange={(event) => setUrl(event.target.value)}
           />
         </div>
         <button type="submit">Create</button>
@@ -58,7 +58,7 @@ const BlogForm = ({ handleBlogCreate }) => {
 }
 
 BlogForm.propTypes = {
-  handleBlogCreate: PropTypes.func.isRequired
+  handleBlogCreate: PropTypes.func.isRequired,
 }
 
 export default BlogForm

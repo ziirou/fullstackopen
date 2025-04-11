@@ -1,5 +1,5 @@
 {
-  "name": "bloglist",
+  "name": "bloglist-backend",
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
@@ -7,7 +7,11 @@
     "dev": "cross-env NODE_ENV=development node --watch index.js",
     "test": "cross-env NODE_ENV=test node --test",
     "start:test": "cross-env NODE_ENV=test node index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "npx prettier . --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix"
   },
   "author": "Tero Nikula",
   "license": "ISC",
@@ -26,7 +30,9 @@
     "@stylistic/eslint-plugin-js": "^4.2.0",
     "cross-env": "^7.0.3",
     "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.2",
     "globals": "^16.0.0",
+    "prettier": "^3.5.3",
     "supertest": "^7.1.0"
   }
 }

@@ -15,7 +15,7 @@ describe('When there is initially one user at db', () => {
     const passwordHash = await bcrypt.hash('secret', 10)
     const user = new User({
       ...testHelper.initialUser,
-      passwordHash
+      passwordHash,
     })
 
     await user.save()
@@ -55,7 +55,7 @@ describe('When there is initially one user at db', () => {
       const usersAtEnd = await testHelper.usersInDb()
       assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1)
 
-      const usernames = usersAtEnd.map(u => u.username)
+      const usernames = usersAtEnd.map((u) => u.username)
       assert(usernames.includes(newUser.username))
     })
 

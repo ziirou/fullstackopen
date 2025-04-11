@@ -33,11 +33,10 @@ describe('When there is initially some blogs saved', () => {
     token = loginResponse.body.token
 
     // Add user ID to each initial blog
-    const blogsWithUser = testHelper.initialBlogs
-      .map(blog => ({
-        ...blog,
-        user: user._id.toString()
-      }))
+    const blogsWithUser = testHelper.initialBlogs.map((blog) => ({
+      ...blog,
+      user: user._id.toString(),
+    }))
 
     await Blog.insertMany(blogsWithUser)
   })
@@ -66,17 +65,15 @@ describe('When there is initially some blogs saved', () => {
     })
 
     test('All blogs are returned', async () => {
-      const response = await api
-        .get('/api/blogs')
+      const response = await api.get('/api/blogs')
 
       assert.strictEqual(response.body.length, testHelper.initialBlogs.length)
     })
 
     test('A specific blog is within the returned blogs', async () => {
-      const response = await api
-        .get('/api/blogs')
+      const response = await api.get('/api/blogs')
 
-      const titles = response.body.map(r => r.title)
+      const titles = response.body.map((r) => r.title)
       assert(titles.includes('First Blog'))
     })
 
@@ -86,7 +83,11 @@ describe('When there is initially some blogs saved', () => {
       for (const blog of blogs) {
         assert(blog.id, 'Blog should have an id property')
         assert.strictEqual(typeof blog.id, 'string', 'id should be a string')
-        assert.strictEqual('_id' in blog, false, 'Blog should not have _id property')
+        assert.strictEqual(
+          '_id' in blog,
+          false,
+          'Blog should not have _id property'
+        )
       }
     })
   })
@@ -102,7 +103,7 @@ describe('When there is initially some blogs saved', () => {
 
       const response = await api
         .post('/api/blogs')
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -133,7 +134,7 @@ describe('When there is initially some blogs saved', () => {
 
       const response = await api
         .post('/api/blogs')
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -152,10 +153,7 @@ describe('When there is initially some blogs saved', () => {
         likes: 666,
       }
 
-      await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(401)
+      await api.post('/api/blogs').send(newBlog).expect(401)
     })
 
     test('Fails with status code 400 if title is missing', async () => {
@@ -167,7 +165,7 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .send(newBlog)
         .expect(400)
 
@@ -184,7 +182,7 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .post('/api/blogs')
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .send(newBlog)
         .expect(400)
 
@@ -200,14 +198,14 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .expect(204)
 
       const blogsAtEnd = await testHelper.blogsInDb()
 
       assert.strictEqual(blogsAtEnd.length, testHelper.initialBlogs.length - 1)
 
-      const titles = blogsAtEnd.map(r => r.title)
+      const titles = blogsAtEnd.map((r) => r.title)
       assert(!titles.includes(blogToDelete.title))
     })
 
@@ -215,9 +213,7 @@ describe('When there is initially some blogs saved', () => {
       const blogsAtStart = await testHelper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
 
-      await api
-        .delete(`/api/blogs/${blogToDelete.id}`)
-        .expect(401)
+      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(401)
     })
   })
 
@@ -235,7 +231,7 @@ describe('When there is initially some blogs saved', () => {
 
       const response = await api
         .put(`/api/blogs/${idBlogToEdit}`)
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .send(editedBlog)
         .expect(200)
         .expect('Content-Type', /application\/json/)
@@ -251,7 +247,7 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${invalidId}`)
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .expect(400)
     })
 
@@ -260,7 +256,7 @@ describe('When there is initially some blogs saved', () => {
 
       await api
         .put(`/api/blogs/${missingId}`)
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .expect(404)
     })
 
@@ -276,7 +272,7 @@ describe('When there is initially some blogs saved', () => {
 
       const response = await api
         .put(`/api/blogs/${idBlogToEdit}`)
-        .set({ 'Authorization': `Bearer ${token}` })
+        .set({ Authorization: `Bearer ${token}` })
         .send(editedBlog)
         .expect(400)
         .expect('Content-Type', /application\/json/)

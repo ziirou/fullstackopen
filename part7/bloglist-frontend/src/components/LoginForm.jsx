@@ -24,19 +24,21 @@ const LoginForm = ({ handleLogin }) => {
       <form onSubmit={handleSubmit}>
         <div>
           Username:
-          <input className='login'
-            data-testid='username'
+          <input
+            className="login"
+            data-testid="username"
             value={username}
-            onChange={event => setUsername(event.target.value)}
+            onChange={(event) => setUsername(event.target.value)}
           />
         </div>
         <div>
           Password:
-          <input className='login'
-            data-testid='password'
+          <input
+            className="login"
+            data-testid="password"
             type="password"
             value={password}
-            onChange={event => setPassword(event.target.value)}
+            onChange={(event) => setPassword(event.target.value)}
           />
         </div>
         <button type="submit">Login</button>
@@ -46,7 +48,7 @@ const LoginForm = ({ handleLogin }) => {
 }
 
 LoginForm.propTypes = {
-  handleLogin: PropTypes.func.isRequired
+  handleLogin: PropTypes.func.isRequired,
 }
 
 export default LoginForm

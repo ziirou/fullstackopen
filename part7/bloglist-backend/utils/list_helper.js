@@ -9,9 +9,7 @@ const totalLikes = (blogs) => {
     return sum + likes
   }
 
-  return blogs.length === 0
-    ? 0
-    : blogs.reduce(sumReducer, 0)
+  return blogs.length === 0 ? 0 : blogs.reduce(sumReducer, 0)
 }
 
 const favoriteBlog = (blogs) => {
@@ -21,9 +19,7 @@ const favoriteBlog = (blogs) => {
 
   // Reducer function to find blog with the most likes
   const maxReducer = (max, blog) => {
-    return blog.likes > max.likes
-      ? blog
-      : max
+    return blog.likes > max.likes ? blog : max
   }
 
   // Find the blog with the most likes
@@ -32,7 +28,7 @@ const favoriteBlog = (blogs) => {
   return {
     title: favorite.title,
     author: favorite.author,
-    likes: favorite.likes
+    likes: favorite.likes,
   }
 }
 
@@ -52,18 +48,18 @@ const mostBlogs = (blogs) => {
 
   // Reducer function to find the author with the most blogs
   const maxReducer = (max, author) => {
-    return authorsWithBlogs[author] > authorsWithBlogs[max]
-      ? author
-      : max
+    return authorsWithBlogs[author] > authorsWithBlogs[max] ? author : max
   }
 
   // Find the author with the most blogs by reducing over the keys (authors)
-  const maxAuthor = Object.keys(authorsWithBlogs)
-    .reduce(maxReducer, Object.keys(authorsWithBlogs)[0])
+  const maxAuthor = Object.keys(authorsWithBlogs).reduce(
+    maxReducer,
+    Object.keys(authorsWithBlogs)[0]
+  )
 
   return {
     author: maxAuthor,
-    blogs: authorsWithBlogs[maxAuthor]
+    blogs: authorsWithBlogs[maxAuthor],
   }
 }
 
@@ -83,18 +79,18 @@ const mostLikes = (blogs) => {
 
   // Reducer function to find the author with the most likes
   const maxReducer = (max, author) => {
-    return authorsWithLikes[author] > authorsWithLikes[max]
-      ? author
-      : max
+    return authorsWithLikes[author] > authorsWithLikes[max] ? author : max
   }
 
   // Find the author with the most likes by reducing over the keys (authors)
-  const maxAuthor = Object.keys(authorsWithLikes)
-    .reduce(maxReducer, Object.keys(authorsWithLikes)[0])
+  const maxAuthor = Object.keys(authorsWithLikes).reduce(
+    maxReducer,
+    Object.keys(authorsWithLikes)[0]
+  )
 
   return {
     author: maxAuthor,
-    likes: authorsWithLikes[maxAuthor]
+    likes: authorsWithLikes[maxAuthor],
   }
 }
 
@@ -103,5 +99,5 @@ module.exports = {
   totalLikes,
   favoriteBlog,
   mostBlogs,
-  mostLikes
+  mostLikes,
 }

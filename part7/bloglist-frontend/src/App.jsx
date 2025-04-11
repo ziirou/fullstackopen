@@ -19,7 +19,7 @@ const App = () => {
   const handleNotification = (message, type, timeout) => {
     setNotification({
       message: message,
-      type: type
+      type: type,
     })
     setTimeout(() => {
       setNotification(null)
@@ -30,14 +30,17 @@ const App = () => {
     const fetchBlogs = async () => {
       try {
         const fetchedBlogs = await blogService.getAll()
-        setBlogs([...fetchedBlogs].sort((less, more) => more.likes - less.likes))
+        setBlogs(
+          [...fetchedBlogs].sort((less, more) => more.likes - less.likes)
+        )
       } catch (exception) {
         console.log(exception)
 
         handleNotification(
           `Fetching blogs failed:
             ${exception.response.data.error || `status code: ${exception.status}`}`,
-          'error', 5000
+          'error',
+          5000
         )
       }
     }
@@ -57,19 +60,19 @@ const App = () => {
   const handleLogin = async ({ username, password }) => {
     try {
       const user = await loginService.login({
-        username, password,
+        username,
+        password,
       })
 
-      window.localStorage.setItem(
-        'loggedBloglistAppUser', JSON.stringify(user)
-      )
+      window.localStorage.setItem('loggedBloglistAppUser', JSON.stringify(user))
 
       setUser(user)
       blogService.setToken(user.token)
 
       handleNotification(
         `${user.name} successfully logged in`,
-        'notification', 5000
+        'notification',
+        5000
       )
     } catch (exception) {
       console.log('Login failed:', exception)
@@ -77,7 +80,8 @@ const App = () => {
       handleNotification(
         `Login failed:
           ${exception.response.data.error || `status code: ${exception.status}`}`,
-        'error', 5000
+        'error',
+        5000
       )
     }
   }
@@ -91,7 +95,8 @@ const App = () => {
 
       handleNotification(
         `${logoutUser} successfully logged out`,
-        'notification', 5000
+        'notification',
+        5000
       )
     } catch (exception) {
       console.log('Logout failed:', exception)
@@ -99,7 +104,8 @@ const App = () => {
       handleNotification(
         `Logout failed:
           ${exception.response.data.error || `status code: ${exception.status}`}`,
-        'error', 5000
+        'error',
+        5000
       )
     }
   }
@@ -115,12 +121,14 @@ const App = () => {
       if (createdBlog.author) {
         handleNotification(
           `New blog created: '${createdBlog.title} by ${createdBlog.author}'`,
-          'notification', 5000
+          'notification',
+          5000
         )
       } else {
         handleNotification(
           `New blog '${createdBlog.title}' created without an author`,
-          'warning', 5000
+          'warning',
+          5000
         )
       }
     } catch (exception) {
@@ -129,53 +137,61 @@ const App = () => {
       handleNotification(
         `Blog creation failed:
           ${exception.response.data.error || `status code: ${exception.status}`}`,
-        'error', 5000
+        'error',
+        5000
       )
     }
   }
 
   const handleBlogRemove = async (blogObject) => {
-    if (!confirm(`Remove blog '${blogObject.title}' by '${blogObject.author}'?`)) {
+    if (
+      !confirm(`Remove blog '${blogObject.title}' by '${blogObject.author}'?`)
+    ) {
       return
     }
 
     try {
       await blogService.remove(blogObject.id)
 
-      setBlogs(blogs => blogs.filter(blog => blog.id !== blogObject.id))
+      setBlogs((blogs) => blogs.filter((blog) => blog.id !== blogObject.id))
 
       handleNotification(
         `Blog '${blogObject.title}' successfully removed`,
-        'notification', 5000
+        'notification',
+        5000
       )
-    } catch(exception) {
+    } catch (exception) {
       console.log('Blog removing failed:', exception)
 
       handleNotification(
         `Blog removing failed:
           ${exception.response.data.error || `status code: ${exception.status}`}`,
-        'error', 5000
+        'error',
+        5000
       )
     }
   }
 
   const handleBlogLike = async (blogObject) => {
-    const editedBlog = { ...blogObject, likes: (blogObject.likes + 1) }
+    const editedBlog = { ...blogObject, likes: blogObject.likes + 1 }
 
     try {
       await blogService.update(editedBlog)
       /* Blog component needs other user information
           in addition to user id, so let's not use the returned blog. */
-      setBlogs([...blogs]
-        .map(blog => blog.id !== blogObject.id ? blog : editedBlog)
-        .sort((less, more) => more.likes - less.likes))
-    } catch(exception) {
+      setBlogs(
+        [...blogs]
+          .map((blog) => (blog.id !== blogObject.id ? blog : editedBlog))
+          .sort((less, more) => more.likes - less.likes)
+      )
+    } catch (exception) {
       console.log('Blog editing failed:', exception)
 
       handleNotification(
         `Blog editing failed:
           ${exception.response.data.error || `status code: ${exception.status}`}`,
-        'error', 5000
+        'error',
+        5000
       )
     }
   }
@@ -184,26 +200,23 @@ const App = () => {
     <div>
       <Notification notification={notification} />
 
-      {!user &&
+      {!user && (
         <Togglable buttonLabel="Log in">
           <LoginForm handleLogin={handleLogin} />
         </Togglable>
-      }
+      )}
 
-      {user &&
+      {user && (
         <div>
           <b>{user.name}</b> logged in
-          <button className='logout'
-            onClick={handleLogout}>
+          <button className="logout" onClick={handleLogout}>
             Logout
           </button>
-
           <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
             <BlogForm handleBlogCreate={handleBlogCreate} />
           </Togglable>
-
           <h2>Blogs</h2>
-          {blogs.map(blog =>
+          {blogs.map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
@@ -211,9 +224,9 @@ const App = () => {
               handleBlogLike={handleBlogLike}
               handleBlogRemove={handleBlogRemove}
             />
-          )}
+          ))}
         </div>
-      }
+      )}
     </div>
   )
 }
