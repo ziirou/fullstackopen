@@ -37,7 +37,8 @@ const App = () => {
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
     onSuccess: (createdBlog) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(createdBlog))
 
       if (createdBlog.author) {
         handleNotification(
@@ -67,8 +68,12 @@ const App = () => {
 
   const removeBlogMutation = useMutation({
     mutationFn: blogService.remove,
-    onSuccess: (_, { title }) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    onSuccess: (_, { id, title }) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.filter((blog) => blog.id !== id)
+      )
 
       handleNotification(
         `Blog '${title}' successfully removed`,
@@ -90,9 +95,19 @@ const App = () => {
 
   const updateBlogMutation = useMutation({
     mutationFn: blogService.update,
-    onSuccess: ({ title }) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] })
-      handleNotification(`Liked blog: '${title}'`, 'notification', 5000)
+    onSuccess: (updatedBlog, { user }) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      updatedBlog.user = user
+      queryClient.setQueryData(
+        ['blogs'],
+        blogs.map((blog) => (blog.id !== updatedBlog.id ? blog : updatedBlog))
+      )
+
+      handleNotification(
+        `Liked blog: '${updatedBlog.title}'`,
+        'notification',
+        5000
+      )
     },
     onError: (error) => {
       console.log('Blog updating failed:', error)
@@ -122,6 +137,7 @@ const App = () => {
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
     retry: 1,
+    refetchOnWindowFocus: false,
   })
   console.log('result:', JSON.parse(JSON.stringify(result)))
 
