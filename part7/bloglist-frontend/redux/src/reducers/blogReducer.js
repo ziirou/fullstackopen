@@ -6,7 +6,7 @@ const blogSlice = createSlice({
   initialState: [],
   reducers: {
     setBlogs(_, action) {
-      return action.payload.sort((less, more) => more.votes - less.votes)
+      return action.payload.sort((less, more) => more.likes - less.likes)
     },
     appendBlog(state, action) {
       state.push(action.payload)
