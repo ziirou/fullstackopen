@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useMatch } from 'react-router-dom'
 
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -8,6 +8,7 @@ import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import Users from './components/Users'
+import User from './components/User'
 
 import {
   initializeBlogs,
@@ -21,6 +22,7 @@ import { login, logout } from './reducers/loginReducer'
 const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector((state) => state.blogs)
+  const users = useSelector((state) => state.users)
   const loggedUser = useSelector((state) => state.loggedUser)
 
   const blogFormRef = useRef()
@@ -56,6 +58,11 @@ const App = () => {
   const handleBlogLike = async (blogObject) => {
     dispatch(likeBlog(blogObject))
   }
+
+  const match = useMatch('/users/:id')
+  const userMatch = match
+    ? users.find((user) => user.id === match.params.id)
+    : null
 
   return (
     <div>
@@ -102,7 +109,8 @@ const App = () => {
             </div>
           }
         />
-        <Route path="/users" element={<Users />} />
+        <Route path="/users" element={<Users users={users} />} />
+        <Route path="/users/:id" element={<User user={userMatch} />} />
       </Routes>
     </div>
   )
