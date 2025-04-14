@@ -2,11 +2,11 @@ import { useContext } from 'react'
 import NotifContext from './NotifContext'
 
 export const useNotification = () => {
-  const notifAndDispatch = useContext(NotifContext)
-  return notifAndDispatch[0]
+  const [notification] = useContext(NotifContext)
+  return notification
 }
 
 export const useNotifDispatch = () => {
-  const notifAndDispatch = useContext(NotifContext)
-  return notifAndDispatch[1]
+  const valueAndDispatch = useContext(NotifContext)
+  return valueAndDispatch[1]
 }

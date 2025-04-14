@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
 import Blog from './components/Blog'
@@ -11,11 +11,13 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 import { useNotifDispatch } from './context/NotifHooks'
+import { useUserValue, useUserDispatch } from './context/UserHooks'
 
 const App = () => {
   const queryClient = useQueryClient()
   const notifDispatch = useNotifDispatch()
-  const [user, setUser] = useState(null)
+  const user = useUserValue()
+  const userDispatch = useUserDispatch()
 
   const blogFormRef = useRef()
 
@@ -108,10 +110,13 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      userDispatch({
+        type: 'SET',
+        payload: user,
+      })
       blogService.setToken(user.token)
     }
-  }, [])
+  }, [userDispatch])
 
   const result = useQuery({
     queryKey: ['blogs'],
@@ -137,7 +142,10 @@ const App = () => {
 
       window.localStorage.setItem('loggedBloglistAppUser', JSON.stringify(user))
 
-      setUser(user)
+      userDispatch({
+        type: 'SET',
+        payload: user,
+      })
       blogService.setToken(user.token)
 
       handleNotification(
@@ -163,7 +171,9 @@ const App = () => {
     try {
       const logoutUser = user.name
       window.localStorage.removeItem('loggedBloglistAppUser')
-      setUser(null)
+      userDispatch({
+        type: 'CLEAR',
+      })
       blogService.setToken(null)
 
       handleNotification(
