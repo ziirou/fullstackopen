@@ -3,5 +3,5 @@
 The answers for the exercises of part 7
 
 Exercises 7.10-7.13 done separately with:
-  - Redux (7.13 not yet)
+  - Redux
   - React Query & Context
