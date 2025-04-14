@@ -21,12 +21,12 @@ const create = async (newObject) => {
   return response.data
 }
 
-const remove = async (id) => {
+const remove = async (object) => {
   const config = {
     headers: { Authorization: token },
   }
 
-  const response = await axios.delete(`${baseUrl}/${id}`, config)
+  const response = await axios.delete(`${baseUrl}/${object.id}`, config)
   return response.data
 }
 

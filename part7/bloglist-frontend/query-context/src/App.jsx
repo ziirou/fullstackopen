@@ -63,6 +63,46 @@ const App = () => {
     },
   })
 
+  const removeBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: (_, { title }) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+
+      handleNotification(
+        `Blog '${title}' successfully removed`,
+        'notification',
+        5000
+      )
+    },
+    onError: (error) => {
+      console.log('Blog removing failed:', error)
+
+      handleNotification(
+        'Blog removing failed: ' +
+          `${error.response.data.error || `status code: ${error.status}`}`,
+        'error',
+        5000
+      )
+    },
+  })
+
+  const updateBlogMutation = useMutation({
+    mutationFn: blogService.update,
+    onSuccess: ({ title }) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      handleNotification(`Liked blog: '${title}'`, 'notification', 5000)
+    },
+    onError: (error) => {
+      console.log('Blog updating failed:', error)
+
+      handleNotification(
+        'Blog updating failed: ' +
+          `${error.response.data.error || `status code: ${error.status}`}`,
+        'error',
+        5000
+      )
+    },
+  })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
@@ -157,54 +197,11 @@ const App = () => {
       return
     }
 
-    try {
-      await blogService.remove(blogObject.id)
-
-      //setBlogs((blogs) => blogs.filter((blog) => blog.id !== blogObject.id))
-
-      handleNotification(
-        `Blog '${blogObject.title}' successfully removed`,
-        'notification',
-        5000
-      )
-    } catch (exception) {
-      console.log('Blog removing failed:', exception)
-
-      handleNotification(
-        'Blog removing failed: ' +
-          `${
-            exception.response.data.error || `status code: ${exception.status}`
-          }`,
-        'error',
-        5000
-      )
-    }
+    removeBlogMutation.mutate(blogObject)
   }
 
-  const handleBlogLike = async (blogObject) => {
-    const editedBlog = { ...blogObject, likes: blogObject.likes + 1 }
-
-    try {
-      await blogService.update(editedBlog)
-      /* Blog component needs other user information
-          in addition to user id, so let's not use the returned blog. */
-      /*setBlogs(
-        [...blogs]
-          .map((blog) => (blog.id !== blogObject.id ? blog : editedBlog))
-          .sort((less, more) => more.likes - less.likes)
-      )*/
-    } catch (exception) {
-      console.log('Blog editing failed:', exception)
-
-      handleNotification(
-        'Blog editing failed: ' +
-          `${
-            exception.response.data.error || `status code: ${exception.status}`
-          }`,
-        'error',
-        5000
-      )
-    }
+  const handleBlogLike = (blogObject) => {
+    updateBlogMutation.mutate({ ...blogObject, likes: blogObject.likes + 1 })
   }
 
   return (
