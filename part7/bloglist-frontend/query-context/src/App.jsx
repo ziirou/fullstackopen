@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -12,52 +13,56 @@ import loginService from './services/login'
 import { useNotifDispatch } from './context/NotifHooks'
 
 const App = () => {
+  const queryClient = useQueryClient()
   const notifDispatch = useNotifDispatch()
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
 
-  const handleNotification = useCallback(
-    (message, notifType, timeout) => {
-      notifDispatch({
-        type: 'SET',
-        payload: {
-          message: message,
-          type: notifType,
-        },
-      })
-      setTimeout(() => {
-        notifDispatch({ type: 'CLEAR', payload: '' })
-      }, timeout)
-    },
-    [notifDispatch]
-  )
+  const handleNotification = (message, notifType, timeout) => {
+    notifDispatch({
+      type: 'SET',
+      payload: {
+        message: message,
+        type: notifType,
+      },
+    })
+    setTimeout(() => {
+      notifDispatch({ type: 'CLEAR', payload: '' })
+    }, timeout)
+  }
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const fetchedBlogs = await blogService.getAll()
-        setBlogs(
-          [...fetchedBlogs].sort((less, more) => more.likes - less.likes)
-        )
-      } catch (exception) {
-        console.log(exception)
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (createdBlog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
 
+      if (createdBlog.author) {
         handleNotification(
-          'Fetching blogs failed: ' +
-            `${
-              exception.response.data.error ||
-              `status code: ${exception.status}`
-            }`,
-          'error',
+          `New blog created: '${createdBlog.title} by ${createdBlog.author}'`,
+          'notification',
+          5000
+        )
+      } else {
+        handleNotification(
+          `New blog '${createdBlog.title}' created without an author`,
+          'warning',
           5000
         )
       }
-    }
+    },
+    onError: (error) => {
+      console.log('Blog creation failed:', error)
 
-    fetchBlogs()
-  }, [handleNotification])
+      handleNotification(
+        'Blog creation failed: ' +
+          `${error.response.data.error || `status code: ${error.status}`}`,
+        'error',
+        5000
+      )
+    },
+  })
+
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
@@ -67,6 +72,21 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+    retry: 1,
+  })
+  console.log('result:', JSON.parse(JSON.stringify(result)))
+
+  if (result.isLoading) {
+    return <div>loading data...</div>
+  } else if (result.isError) {
+    return <div>blog service not available due to problems in server</div>
+  }
+
+  const blogs = result.data.sort((less, more) => more.likes - less.likes)
 
   const handleLogin = async ({ username, password }) => {
     try {
@@ -125,39 +145,9 @@ const App = () => {
     }
   }
 
-  const handleBlogCreate = async (blogObject) => {
-    try {
-      const createdBlog = await blogService.create(blogObject)
-
-      blogFormRef.current.toggleVisibility()
-      /* No need to sort here as the new one goes to the bottom. */
-      setBlogs(blogs.concat(createdBlog))
-
-      if (createdBlog.author) {
-        handleNotification(
-          `New blog created: '${createdBlog.title} by ${createdBlog.author}'`,
-          'notification',
-          5000
-        )
-      } else {
-        handleNotification(
-          `New blog '${createdBlog.title}' created without an author`,
-          'warning',
-          5000
-        )
-      }
-    } catch (exception) {
-      console.log('Blog creation failed:', exception)
-
-      handleNotification(
-        'Blog creation failed: ' +
-          `${
-            exception.response.data.error || `status code: ${exception.status}`
-          }`,
-        'error',
-        5000
-      )
-    }
+  const handleBlogCreate = (blogObject) => {
+    newBlogMutation.mutate(blogObject)
+    blogFormRef.current.toggleVisibility()
   }
 
   const handleBlogRemove = async (blogObject) => {
@@ -170,7 +160,7 @@ const App = () => {
     try {
       await blogService.remove(blogObject.id)
 
-      setBlogs((blogs) => blogs.filter((blog) => blog.id !== blogObject.id))
+      //setBlogs((blogs) => blogs.filter((blog) => blog.id !== blogObject.id))
 
       handleNotification(
         `Blog '${blogObject.title}' successfully removed`,
@@ -198,11 +188,11 @@ const App = () => {
       await blogService.update(editedBlog)
       /* Blog component needs other user information
           in addition to user id, so let's not use the returned blog. */
-      setBlogs(
+      /*setBlogs(
         [...blogs]
           .map((blog) => (blog.id !== blogObject.id ? blog : editedBlog))
           .sort((less, more) => more.likes - less.likes)
-      )
+      )*/
     } catch (exception) {
       console.log('Blog editing failed:', exception)
 
