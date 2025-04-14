@@ -1,7 +1,9 @@
-# Exercises 7.1-7.13
+# Exercises 7.1-7.14
 
 The answers for the exercises of part 7
 
 Exercises 7.10-7.13 done separately with:
   - Redux
   - React Query & Context
+
+Exercise 7.14 only for Redux.

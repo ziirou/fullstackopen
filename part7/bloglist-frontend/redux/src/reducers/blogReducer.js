@@ -23,8 +23,7 @@ const blogSlice = createSlice({
   },
 })
 
-export const { setBlogs, appendBlog, deleteBlog, updateBlog } =
-  blogSlice.actions
+const { setBlogs, appendBlog, deleteBlog, updateBlog } = blogSlice.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -32,7 +31,7 @@ export const initializeBlogs = () => {
       const blogs = await blogService.getAll()
       dispatch(setBlogs(blogs))
     } catch (exception) {
-      console.log(exception)
+      console.log('Fetching blogs failed:', exception)
 
       dispatch(
         setNotification(
