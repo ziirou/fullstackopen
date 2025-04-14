@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
 import Blog from './components/Blog'
@@ -7,7 +7,6 @@ import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
-import { setNotification } from './reducers/notificationReducer'
 import {
   initializeBlogs,
   createBlog,
@@ -23,74 +22,21 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  const handleNotification = useCallback(
-    (message, type, timeout) => {
-      dispatch(setNotification(message, type, timeout))
-    },
-    [dispatch]
-  )
-
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        dispatch(initializeBlogs())
-      } catch (exception) {
-        console.log(exception)
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
-        handleNotification(
-          'Fetching blogs failed: ' +
-            `${
-              exception.response.data.error ||
-              `status code: ${exception.status}`
-            }`,
-          'error',
-          5000
-        )
-      }
-    }
-
-    fetchBlogs()
-  }, [dispatch, handleNotification])
-
-  const handleLogin = ({ username, password }) => {
+  const handleLogin = async ({ username, password }) => {
     dispatch(login(username, password))
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     dispatch(logout(user.name))
   }
 
   const handleBlogCreate = async (blogObject) => {
-    try {
-      dispatch(createBlog(blogObject))
-
-      blogFormRef.current.toggleVisibility()
-
-      if (blogObject.author) {
-        handleNotification(
-          `New blog created: '${blogObject.title} by ${blogObject.author}'`,
-          'notification',
-          5000
-        )
-      } else {
-        handleNotification(
-          `New blog '${blogObject.title}' created without an author`,
-          'warning',
-          5000
-        )
-      }
-    } catch (exception) {
-      console.log('Blog creation failed:', exception)
-
-      handleNotification(
-        'Blog creation failed: ' +
-          `${
-            exception.response.data.error || `status code: ${exception.status}`
-          }`,
-        'error',
-        5000
-      )
-    }
+    dispatch(createBlog(blogObject))
+    blogFormRef.current.toggleVisibility()
   }
 
   const handleBlogRemove = async (blogObject) => {
@@ -100,43 +46,11 @@ const App = () => {
       return
     }
 
-    try {
-      dispatch(removeBlog(blogObject.id))
-
-      handleNotification(
-        `Blog '${blogObject.title}' successfully removed`,
-        'notification',
-        5000
-      )
-    } catch (exception) {
-      console.log('Blog removing failed:', exception)
-
-      handleNotification(
-        'Blog removing failed: ' +
-          `${
-            exception.response.data.error || `status code: ${exception.status}`
-          }`,
-        'error',
-        5000
-      )
-    }
+    dispatch(removeBlog(blogObject))
   }
 
   const handleBlogLike = async (blogObject) => {
-    try {
-      dispatch(likeBlog(blogObject))
-    } catch (exception) {
-      console.log('Blog editing failed:', exception)
-
-      handleNotification(
-        'Blog editing failed: ' +
-          `${
-            exception.response.data.error || `status code: ${exception.status}`
-          }`,
-        'error',
-        5000
-      )
-    }
+    dispatch(likeBlog(blogObject))
   }
 
   return (

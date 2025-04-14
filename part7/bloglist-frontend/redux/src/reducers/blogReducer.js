@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
+import { setNotification } from '../reducers/notificationReducer'
 
 const blogSlice = createSlice({
   name: 'blogs',
@@ -27,33 +28,123 @@ export const { setBlogs, appendBlog, deleteBlog, updateBlog } =
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
-    const blogs = await blogService.getAll()
-    dispatch(setBlogs(blogs))
+    try {
+      const blogs = await blogService.getAll()
+      dispatch(setBlogs(blogs))
+    } catch (exception) {
+      console.log(exception)
+
+      dispatch(
+        setNotification(
+          'Fetching blogs failed: ' +
+            `${
+              exception.response.data.error ||
+              `status code: ${exception.status}`
+            }`,
+          'error',
+          5000
+        )
+      )
+    }
   }
 }
 
 export const createBlog = (content) => {
   return async (dispatch) => {
-    const newBlog = await blogService.create(content)
-    dispatch(appendBlog(newBlog))
+    try {
+      const newBlog = await blogService.create(content)
+      dispatch(appendBlog(newBlog))
+
+      if (newBlog.author) {
+        dispatch(
+          setNotification(
+            `New blog created: '${newBlog.title} by ${newBlog.author}'`,
+            'notification',
+            5000
+          )
+        )
+      } else {
+        dispatch(
+          setNotification(
+            `New blog '${newBlog.title}' created without an author`,
+            'warning',
+            5000
+          )
+        )
+      }
+    } catch (exception) {
+      console.log('Blog creation failed:', exception)
+
+      dispatch(
+        setNotification(
+          'Blog creation failed: ' +
+            `${
+              exception.response.data.error ||
+              `status code: ${exception.status}`
+            }`,
+          'error',
+          5000
+        )
+      )
+    }
   }
 }
 
-export const removeBlog = (id) => {
+export const removeBlog = (blogObject) => {
   return async (dispatch) => {
-    await blogService.remove(id)
-    dispatch(deleteBlog(id))
+    try {
+      await blogService.remove(blogObject.id)
+      dispatch(deleteBlog(blogObject.id))
+
+      dispatch(
+        setNotification(
+          `Blog '${blogObject.title}' successfully removed`,
+          'notification',
+          5000
+        )
+      )
+    } catch (exception) {
+      console.log('Blog removing failed:', exception)
+
+      dispatch(
+        setNotification(
+          'Blog removing failed: ' +
+            `${
+              exception.response.data.error ||
+              `status code: ${exception.status}`
+            }`,
+          'error',
+          5000
+        )
+      )
+    }
   }
 }
 
 export const likeBlog = (blogObject) => {
   return async (dispatch) => {
-    const updatedBlog = await blogService.update({
-      ...blogObject,
-      likes: blogObject.likes + 1,
-    })
-    updatedBlog.user = blogObject.user
-    dispatch(updateBlog(updatedBlog))
+    try {
+      const updatedBlog = await blogService.update({
+        ...blogObject,
+        likes: blogObject.likes + 1,
+      })
+      updatedBlog.user = blogObject.user
+      dispatch(updateBlog(updatedBlog))
+    } catch (exception) {
+      console.log('Blog editing failed:', exception)
+
+      dispatch(
+        setNotification(
+          'Blog editing failed: ' +
+            `${
+              exception.response.data.error ||
+              `status code: ${exception.status}`
+            }`,
+          'error',
+          5000
+        )
+      )
+    }
   }
 }
 
