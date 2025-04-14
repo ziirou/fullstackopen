@@ -11,7 +11,12 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 import { setNotification } from './reducers/notificationReducer'
-import { initializeBlogs, createBlog } from './reducers/blogReducer'
+import {
+  initializeBlogs,
+  createBlog,
+  removeBlog,
+  likeBlog,
+} from './reducers/blogReducer'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -156,9 +161,7 @@ const App = () => {
     }
 
     try {
-      await blogService.remove(blogObject.id)
-
-      //setBlogs((blogs) => blogs.filter((blog) => blog.id !== blogObject.id))
+      dispatch(removeBlog(blogObject.id))
 
       handleNotification(
         `Blog '${blogObject.title}' successfully removed`,
@@ -180,17 +183,8 @@ const App = () => {
   }
 
   const handleBlogLike = async (blogObject) => {
-    const editedBlog = { ...blogObject, likes: blogObject.likes + 1 }
-
     try {
-      await blogService.update(editedBlog)
-      /* Blog component needs other user information
-          in addition to user id, so let's not use the returned blog. */
-      /*setBlogs(
-        [...blogs]
-          .map((blog) => (blog.id !== blogObject.id ? blog : editedBlog))
-          .sort((less, more) => more.likes - less.likes)
-      )*/
+      dispatch(likeBlog(blogObject))
     } catch (exception) {
       console.log('Blog editing failed:', exception)
 
