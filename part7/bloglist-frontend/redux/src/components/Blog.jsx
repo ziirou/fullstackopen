@@ -26,6 +26,17 @@ const Blog = ({ blog, loggedUser, handleBlogLike, handleBlogRemove }) => {
         {(!blog.user || blog.user.username === loggedUser) && (
           <button onClick={() => handleBlogRemove(blog)}>Remove</button>
         )}
+
+        {blog.comments && blog.comments.length > 0 && (
+          <div>
+            <h3>Comments</h3>
+            <ul>
+              {blog.comments.map((comment) => (
+                <li key={comment.id}>{comment.comment}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   )

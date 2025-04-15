@@ -99,6 +99,7 @@ describe('When there is initially some blogs saved', () => {
         author: 'New Person',
         url: 'new_url',
         likes: 444,
+        comments: [],
       }
 
       const response = await api
@@ -227,6 +228,7 @@ describe('When there is initially some blogs saved', () => {
         author: 'Edited Person',
         url: 'edited_url',
         likes: 888,
+        comments: [],
       }
 
       const response = await api
