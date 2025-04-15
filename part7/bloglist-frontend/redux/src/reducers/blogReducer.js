@@ -20,10 +20,16 @@ const blogSlice = createSlice({
         .map((blog) => (blog.id !== action.payload.id ? blog : action.payload))
         .sort((less, more) => more.likes - less.likes)
     },
+    commentBlog(state, action) {
+      return state.map((blog) =>
+        blog.id !== action.payload.id ? blog : action.payload
+      )
+    },
   },
 })
 
-const { setBlogs, appendBlog, deleteBlog, updateBlog } = blogSlice.actions
+const { setBlogs, appendBlog, deleteBlog, updateBlog, commentBlog } =
+  blogSlice.actions
 
 export const initializeBlogs = () => {
   return async (dispatch) => {
@@ -128,6 +134,7 @@ export const likeBlog = (blogObject) => {
         likes: blogObject.likes + 1,
       })
       updatedBlog.user = blogObject.user
+      updatedBlog.comments = blogObject.comments
       dispatch(updateBlog(updatedBlog))
     } catch (exception) {
       console.log('Blog editing failed:', exception)
@@ -135,6 +142,47 @@ export const likeBlog = (blogObject) => {
       dispatch(
         setNotification(
           'Blog editing failed: ' +
+            `${
+              exception.response.data.error ||
+              `status code: ${exception.status}`
+            }`,
+          'error',
+          5000
+        )
+      )
+    }
+  }
+}
+
+export const addComment = (blogObject, commentObject) => {
+  return async (dispatch) => {
+    try {
+      const newComment = await blogService.addComment(
+        blogObject.id,
+        commentObject
+      )
+      const commentedBlog = {
+        ...blogObject,
+        comments: [
+          ...blogObject.comments,
+          { comment: newComment.comment, id: newComment.id },
+        ],
+      }
+      dispatch(commentBlog(commentedBlog))
+
+      dispatch(
+        setNotification(
+          `New comment added: '${commentObject.comment}'`,
+          'notification',
+          5000
+        )
+      )
+    } catch (exception) {
+      console.log('Comment addition failed:', exception)
+
+      dispatch(
+        setNotification(
+          'Comment addition failed: ' +
             `${
               exception.response.data.error ||
               `status code: ${exception.status}`

@@ -23,6 +23,7 @@ import {
   createBlog,
   removeBlog,
   likeBlog,
+  addComment,
 } from './reducers/blogReducer'
 import { initializeUsers } from './reducers/userReducer'
 import { login, logout } from './reducers/loginReducer'
@@ -67,6 +68,10 @@ const App = () => {
 
   const handleBlogLike = async (blogObject) => {
     dispatch(likeBlog(blogObject))
+  }
+
+  const handleNewComment = async (blogObject, commentObject) => {
+    dispatch(addComment(blogObject, commentObject))
   }
 
   const userMatch = useMatch('/users/:id')
@@ -133,6 +138,7 @@ const App = () => {
                     loggedUser={loggedUser.username}
                     handleBlogLike={handleBlogLike}
                     handleBlogRemove={handleBlogRemove}
+                    handleNewComment={handleNewComment}
                   />
                 </div>
               )}

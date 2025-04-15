@@ -1,6 +1,24 @@
-const Blog = ({ blog, loggedUser, handleBlogLike, handleBlogRemove }) => {
+import { useState } from 'react'
+
+const Blog = ({
+  blog,
+  loggedUser,
+  handleBlogLike,
+  handleBlogRemove,
+  handleNewComment,
+}) => {
+  const [comment, setComment] = useState('')
+
   if (!blog) {
     return null
+  }
+
+  const handleCommentSubmit = (event) => {
+    event.preventDefault()
+
+    handleNewComment(blog, { comment: comment })
+
+    setComment('')
   }
 
   return (
@@ -27,9 +45,19 @@ const Blog = ({ blog, loggedUser, handleBlogLike, handleBlogRemove }) => {
           <button onClick={() => handleBlogRemove(blog)}>Remove</button>
         )}
 
+        <h3>Comments</h3>
+        <form onSubmit={handleCommentSubmit}>
+          <input
+            type="text"
+            value={comment}
+            aria-label="Comment"
+            onChange={(event) => setComment(event.target.value)}
+          />
+          <button type="submit">Add comment</button>
+        </form>
+
         {blog.comments && blog.comments.length > 0 && (
           <div>
-            <h3>Comments</h3>
             <ul>
               {blog.comments.map((comment) => (
                 <li key={comment.id}>{comment.comment}</li>
