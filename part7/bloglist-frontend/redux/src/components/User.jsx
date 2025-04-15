@@ -1,9 +1,7 @@
 const User = ({ user }) => {
   if (!user) {
     return null
-  }
-
-  if (user.blogs.length === 0) {
+  } else if (user.blogs.length === 0) {
     return (
       <div>
         <b>{user.name}</b> has no blogs

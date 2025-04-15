@@ -1,13 +1,20 @@
 import { useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Routes, Route, useMatch } from 'react-router-dom'
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useMatch,
+} from 'react-router-dom'
 
+import BlogList from './components/BlogList'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
-import Users from './components/Users'
+import UserList from './components/UserList'
 import User from './components/User'
 
 import {
@@ -20,6 +27,7 @@ import { initializeUsers } from './reducers/userReducer'
 import { login, logout } from './reducers/loginReducer'
 
 const App = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const blogs = useSelector((state) => state.blogs)
   const users = useSelector((state) => state.users)
@@ -53,15 +61,21 @@ const App = () => {
     }
 
     dispatch(removeBlog(blogObject))
+    navigate('/')
   }
 
   const handleBlogLike = async (blogObject) => {
     dispatch(likeBlog(blogObject))
   }
 
-  const match = useMatch('/users/:id')
-  const userMatch = match
-    ? users.find((user) => user.id === match.params.id)
+  const userMatch = useMatch('/users/:id')
+  const matchingUser = userMatch
+    ? users.find((user) => user.id === userMatch.params.id)
+    : null
+
+  const blogMatch = useMatch('/blogs/:id')
+  const matchingBlog = blogMatch
+    ? blogs.find((blog) => blog.id === blogMatch.params.id)
     : null
 
   return (
@@ -94,23 +108,32 @@ const App = () => {
                   <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
                     <BlogForm handleBlogCreate={handleBlogCreate} />
                   </Togglable>
-                  <h2>Blogs</h2>
-                  {blogs.map((blog) => (
-                    <Blog
-                      key={blog.id}
-                      blog={blog}
-                      loggedUser={loggedUser.username}
-                      handleBlogLike={handleBlogLike}
-                      handleBlogRemove={handleBlogRemove}
-                    />
-                  ))}
+                  <BlogList blogs={blogs} />
                 </div>
               )}
             </div>
           }
         />
-        <Route path="/users" element={<Users users={users} />} />
-        <Route path="/users/:id" element={<User user={userMatch} />} />
+        <Route path="/blogs" element={<Navigate replace to="/" />} />
+        <Route
+          path="/blogs/:id"
+          element={
+            <div>
+              {loggedUser && (
+                <div>
+                  <Blog
+                    blog={matchingBlog}
+                    loggedUser={loggedUser.username}
+                    handleBlogLike={handleBlogLike}
+                    handleBlogRemove={handleBlogRemove}
+                  />
+                </div>
+              )}
+            </div>
+          }
+        />
+        <Route path="/users" element={<UserList users={users} />} />
+        <Route path="/users/:id" element={<User user={matchingUser} />} />
       </Routes>
     </div>
   )

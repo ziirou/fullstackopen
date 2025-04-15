@@ -6,7 +6,9 @@ import { setNotification } from './notificationReducer'
 const loggedUserJSON = window.localStorage.getItem('loggedBloglistAppUser')
 
 const initialState = loggedUserJSON ? JSON.parse(loggedUserJSON) : null
-blogService.setToken(initialState.token)
+if (initialState && initialState.token) {
+  blogService.setToken(initialState.token)
+}
 
 const loginSlice = createSlice({
   name: 'loggedUser',

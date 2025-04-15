@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 
-const Users = ({ users }) => {
-  if (users.length === 0) {
+const UserList = ({ users }) => {
+  if (!users) {
+    return null
+  } else if (users.length === 0) {
     return <div>no users</div>
   }
 
@@ -30,4 +32,4 @@ const Users = ({ users }) => {
   )
 }
 
-export default Users
+export default UserList
