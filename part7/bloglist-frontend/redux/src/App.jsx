@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   Routes,
   Route,
+  Link,
   Navigate,
   useNavigate,
   useMatch,
@@ -90,9 +91,15 @@ const App = () => {
       )}
 
       {loggedUser && (
-        <div>
+        <div className="menu_bar">
+          <Link className="link" to="/blogs">
+            blogs
+          </Link>
+          <Link className="link" to="/users">
+            users
+          </Link>
           <b>{loggedUser.name}</b> logged in
-          <button className="logout" onClick={handleLogout}>
+          <button className="logout_button" onClick={handleLogout}>
             Logout
           </button>
         </div>
@@ -105,10 +112,10 @@ const App = () => {
             <div>
               {loggedUser && (
                 <div>
+                  <BlogList blogs={blogs} />
                   <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
                     <BlogForm handleBlogCreate={handleBlogCreate} />
                   </Togglable>
-                  <BlogList blogs={blogs} />
                 </div>
               )}
             </div>
