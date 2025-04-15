@@ -1,4 +1,14 @@
 import { useState } from 'react'
+import {
+  MainContainer,
+  H2Header,
+  H3Header,
+  CommonButton,
+  BadButton,
+  Input,
+  Table,
+  TableData,
+} from '../styles'
 
 const Blog = ({
   blog,
@@ -22,51 +32,52 @@ const Blog = ({
   }
 
   return (
-    <div>
-      <h2>
+    <MainContainer>
+      <H2Header>
         {blog.title} - {blog.author}
-      </h2>
-      <div>
-        <div>
-          URL: <a href={`${blog.url}`}>{blog.url}</a>
-        </div>
-        <div>
-          Likes: {blog.likes}
-          <button
-            className="blog_like_button"
-            onClick={() => handleBlogLike(blog)}
-          >
-            Like
-          </button>
-        </div>
-        {blog.user && blog.user.name && <div>Added by: {blog.user.name}</div>}
+      </H2Header>
+      <>
+        <MainContainer>
+          <span>
+            URL: <a href={`${blog.url}`}>{blog.url}</a>
+          </span>
+          <span>Likes: {blog.likes}</span>
+          {blog.user && blog.user.name && (
+            <span>Added by: {blog.user.name}</span>
+          )}
+          <CommonButton onClick={() => handleBlogLike(blog)}>Like</CommonButton>
+        </MainContainer>
 
-        {(!blog.user || blog.user.username === loggedUser) && (
-          <button onClick={() => handleBlogRemove(blog)}>Remove</button>
-        )}
-
-        <h3>Comments</h3>
+        <H3Header>Comments</H3Header>
         <form onSubmit={handleCommentSubmit}>
-          <input
+          <Input
             type="text"
             value={comment}
             aria-label="Comment"
             onChange={(event) => setComment(event.target.value)}
           />
-          <button type="submit">Add comment</button>
+          <CommonButton type="submit">Add comment</CommonButton>
         </form>
 
         {blog.comments && blog.comments.length > 0 && (
-          <div>
-            <ul>
+          <Table>
+            <tbody>
               {blog.comments.map((comment) => (
-                <li key={comment.id}>{comment.comment}</li>
+                <tr key={comment.id}>
+                  <TableData>{comment.comment}</TableData>
+                </tr>
               ))}
-            </ul>
-          </div>
+            </tbody>
+          </Table>
         )}
-      </div>
-    </div>
+      </>
+
+      {(!blog.user || blog.user.username === loggedUser) && (
+        <BadButton onClick={() => handleBlogRemove(blog)}>
+          Remove this blog
+        </BadButton>
+      )}
+    </MainContainer>
   )
 }
 

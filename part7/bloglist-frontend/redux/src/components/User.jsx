@@ -1,3 +1,5 @@
+import { MainContainer, H2Header, H3Header, Table, TableData } from '../styles'
+
 const User = ({ user }) => {
   if (!user) {
     return null
@@ -10,15 +12,21 @@ const User = ({ user }) => {
   }
 
   return (
-    <div>
-      <h2>{user.name}</h2>
-      <h3>added blogs</h3>
-      <ul>
-        {user.blogs.map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
-        ))}
-      </ul>
-    </div>
+    <MainContainer>
+      <H2Header>{user.name}</H2Header>
+      <H3Header>added blogs</H3Header>
+      <Table>
+        <tbody>
+          {user.blogs.map((blog) => (
+            <tr key={blog.id}>
+              <TableData>
+                {blog.title} - {blog.author}
+              </TableData>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </MainContainer>
   )
 }
 

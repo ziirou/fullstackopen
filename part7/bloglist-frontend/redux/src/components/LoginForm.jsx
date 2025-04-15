@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { H2Header, GoodButton, Input, Form } from '../styles'
 
 const LoginForm = ({ handleLogin }) => {
   const [username, setUsername] = useState('')
@@ -18,14 +19,13 @@ const LoginForm = ({ handleLogin }) => {
   }
 
   return (
-    <div>
-      <h2>Login</h2>
+    <>
+      <H2Header>Login</H2Header>
 
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <div>
           Username:
-          <input
-            className="login"
+          <Input
             data-testid="username"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
@@ -33,17 +33,16 @@ const LoginForm = ({ handleLogin }) => {
         </div>
         <div>
           Password:
-          <input
-            className="login"
+          <Input
             data-testid="password"
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
+        <GoodButton type="submit">Login</GoodButton>
+      </Form>
+    </>
   )
 }
 

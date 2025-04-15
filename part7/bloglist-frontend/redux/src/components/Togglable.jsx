@@ -1,5 +1,6 @@
 import { useState, useImperativeHandle, forwardRef } from 'react'
 import PropTypes from 'prop-types'
+import { FormContainer, CommonButton, BadButton } from '../styles'
 
 const Togglable = forwardRef((props, ref) => {
   const [visible, setVisible] = useState(false)
@@ -21,15 +22,17 @@ const Togglable = forwardRef((props, ref) => {
   })
 
   return (
-    <div>
+    <>
       <div style={hideWhenVisible}>
-        <button onClick={toggleVisibility}>{props.buttonLabel}</button>
+        <CommonButton onClick={toggleVisibility}>
+          {props.buttonLabel}
+        </CommonButton>
       </div>
-      <div style={showWhenVisible}>
+      <FormContainer style={showWhenVisible}>
         {props.children}
-        <button onClick={toggleVisibility}>Cancel</button>
-      </div>
-    </div>
+        <BadButton onClick={toggleVisibility}>Cancel</BadButton>
+      </FormContainer>
+    </>
   )
 })
 

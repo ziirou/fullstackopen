@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { H2Header, GoodButton, Input, Form } from '../styles'
 
 const BlogForm = ({ handleBlogCreate }) => {
   const [title, setTitle] = useState('')
@@ -21,12 +22,12 @@ const BlogForm = ({ handleBlogCreate }) => {
   }
 
   return (
-    <div>
-      <h2>Create new blog</h2>
-      <form onSubmit={handleSubmit}>
+    <>
+      <H2Header>Create new blog</H2Header>
+      <Form onSubmit={handleSubmit}>
         <div>
           Title:
-          <input
+          <Input
             type="text"
             value={title}
             aria-label="Title"
@@ -35,7 +36,7 @@ const BlogForm = ({ handleBlogCreate }) => {
         </div>
         <div>
           Author:
-          <input
+          <Input
             type="text"
             value={author}
             aria-label="Author"
@@ -44,16 +45,16 @@ const BlogForm = ({ handleBlogCreate }) => {
         </div>
         <div>
           URL:
-          <input
+          <Input
             type="text"
             value={url}
             aria-label="URL"
             onChange={(event) => setUrl(event.target.value)}
           />
         </div>
-        <button type="submit">Create</button>
-      </form>
-    </div>
+        <GoodButton type="submit">Create</GoodButton>
+      </Form>
+    </>
   )
 }
 

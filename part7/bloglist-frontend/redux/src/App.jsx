@@ -3,11 +3,19 @@ import { useSelector, useDispatch } from 'react-redux'
 import {
   Routes,
   Route,
-  Link,
   Navigate,
   useNavigate,
   useMatch,
 } from 'react-router-dom'
+
+import {
+  MainContainer,
+  MenuBar,
+  MenuText,
+  MenuLink,
+  H1Header,
+  BadButton,
+} from './styles'
 
 import BlogList from './components/BlogList'
 import Blog from './components/Blog'
@@ -85,8 +93,8 @@ const App = () => {
     : null
 
   return (
-    <div>
-      <h1>Bloglist app</h1>
+    <MainContainer>
+      <H1Header>Bloglist app</H1Header>
       <Notification />
 
       {!loggedUser && (
@@ -96,34 +104,30 @@ const App = () => {
       )}
 
       {loggedUser && (
-        <div className="menu_bar">
-          <Link className="link" to="/blogs">
-            blogs
-          </Link>
-          <Link className="link" to="/users">
-            users
-          </Link>
-          <b>{loggedUser.name}</b> logged in
-          <button className="logout_button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
+        <MenuBar>
+          <MenuLink to="/blogs">blogs</MenuLink>
+          <MenuLink to="/users">users</MenuLink>
+          <MenuText>
+            <b>{loggedUser.name}</b> logged in
+          </MenuText>
+          <BadButton onClick={handleLogout}>Logout</BadButton>
+        </MenuBar>
       )}
 
       <Routes>
         <Route
           path="/"
           element={
-            <div>
+            <>
               {loggedUser && (
-                <div>
+                <>
                   <BlogList blogs={blogs} />
                   <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
                     <BlogForm handleBlogCreate={handleBlogCreate} />
                   </Togglable>
-                </div>
+                </>
               )}
-            </div>
+            </>
           }
         />
         <Route path="/blogs" element={<Navigate replace to="/" />} />
@@ -148,7 +152,7 @@ const App = () => {
         <Route path="/users" element={<UserList users={users} />} />
         <Route path="/users/:id" element={<User user={matchingUser} />} />
       </Routes>
-    </div>
+    </MainContainer>
   )
 }
 

@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import { NotificationDiv } from '../styles'
 
 const Notification = () => {
   const notification = useSelector((state) => state.notification)
@@ -8,9 +9,9 @@ const Notification = () => {
   }
 
   return (
-    <div className={`notifications ${notification.type}`}>
+    <NotificationDiv $type={notification.type}>
       {notification.message}
-    </div>
+    </NotificationDiv>
   )
 }
 

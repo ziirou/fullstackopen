@@ -1,4 +1,10 @@
-import { Link } from 'react-router-dom'
+import {
+  MainContainer,
+  StyledLink,
+  H2Header,
+  Table,
+  TableData,
+} from '../styles'
 
 const BlogList = ({ blogs }) => {
   if (!blogs) {
@@ -8,22 +14,22 @@ const BlogList = ({ blogs }) => {
   }
 
   return (
-    <div>
-      <h2>Blogs</h2>
-      <table>
+    <MainContainer>
+      <H2Header>Blogs</H2Header>
+      <Table>
         <tbody>
           {blogs.map((blog) => (
             <tr key={blog.id}>
-              <td className="blog">
-                <Link to={`/blogs/${blog.id}`}>
+              <TableData>
+                <StyledLink to={`/blogs/${blog.id}`}>
                   {blog.title} - {blog.author}
-                </Link>
-              </td>
+                </StyledLink>
+              </TableData>
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+      </Table>
+    </MainContainer>
   )
 }
 

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { MainContainer, StyledLink, H2Header, Table } from '../styles'
 
 const UserList = ({ users }) => {
   if (!users) {
@@ -8,9 +8,9 @@ const UserList = ({ users }) => {
   }
 
   return (
-    <div>
-      <h2>Users</h2>
-      <table>
+    <MainContainer>
+      <H2Header>Users</H2Header>
+      <Table>
         <thead>
           <tr>
             <th></th>
@@ -21,14 +21,14 @@ const UserList = ({ users }) => {
           {users.map((user) => (
             <tr key={user.id}>
               <td>
-                <Link to={`/users/${user.id}`}>{user.name}</Link>
+                <StyledLink to={`/users/${user.id}`}>{user.name}</StyledLink>
               </td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+      </Table>
+    </MainContainer>
   )
 }
 
