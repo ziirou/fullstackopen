@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useMutation } from '@apollo/client'
+import PropTypes from 'prop-types'
 import { EDIT_AUTHOR } from '../queries'
 
-const EditAuthor = () => {
+const EditAuthor = ({ authors }) => {
   const [name, setName] = useState('')
   const [born, setBorn] = useState('')
 
@@ -13,6 +14,10 @@ const EditAuthor = () => {
       console.log('author not found')
     }
   }, [result.data])
+
+  if (authors.length === 0) {
+    return null
+  }
 
   const submit = async (event) => {
     event.preventDefault()
@@ -28,13 +33,22 @@ const EditAuthor = () => {
       <h2>Set birthyear</h2>
 
       <form onSubmit={submit}>
-        <div>
-          name
-          <input
+        <label>
+          name:
+          <select
             value={name}
             onChange={({ target }) => setName(target.value)}
-          />
-        </div>
+          >
+            <option hidden disabled value="">
+              select an author
+             </option>
+            {authors.map((a) => (
+              <option key={a.id} value={a.name}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+        </label>
         <div>
           born
           <input
@@ -47,6 +61,10 @@ const EditAuthor = () => {
       </form>
     </div>
   )
+}
+
+EditAuthor.propTypes = {
+  authors: PropTypes.array.isRequired
 }
 
 export default EditAuthor
