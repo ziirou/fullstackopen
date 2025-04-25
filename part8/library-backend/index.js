@@ -67,17 +67,44 @@ const resolvers = {
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
-    allBooks: async () => {
+    allBooks: async (root, args) => {
+      if (args.author) {
+        const author = await Author.findOne({ name: args.author })
+        if (!author) {
+          return []
+        }
+
+        if (args.genre) {
+          return Book.find({ author: author._id, genres: args.genre })
+        } else {
+          return Book.find({ author: author._id })
+        }
+      } else if (args.genre) {
+        return Book.find({ genres: args.genre })
+      }
+
       return Book.find({})
     },
     allAuthors: async () => {
       return Author.find({})
     },
   },
+  Author: {
+    bookCount: async ({ _id }) =>
+      await Book.collection.countDocuments({ author: _id }),
+  },
+  Book: {
+    author: async ({ author }) => await Author.findById(author),
+  },
   Mutation: {
     addBook: async (root, args) => {
       try {
-        const author = await Author.findOne({ name: args.author })
+        let author = await Author.findOne({ name: args.author })
+        if (!author) {
+          const addAuthorResult =
+            await resolvers.Mutation.addAuthor(root, { name: args.author })
+          author = addAuthorResult
+        }
         const book = new Book({ ...args, author: author._id })
         await book.save()
         return book
@@ -97,7 +124,20 @@ const resolvers = {
       return author
     },
     editAuthor: async (root, args) => {
-      return null
+      const author = await Author.findOne({ name: args.name })
+      if (!author) {
+        console.error('author not found:', args.name)
+        return null
+      }
+      author.born = args.setBornTo
+
+      try {
+        await author.save()
+      } catch (error) {
+        console.error('Error editing author:', error)
+      }
+
+      return author
     },
   }
 }
