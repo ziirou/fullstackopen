@@ -3,9 +3,13 @@ import { useQuery } from '@apollo/client'
 import PropTypes from 'prop-types'
 import { ALL_BOOKS } from '../queries'
 
+let genres = []
+
 const Books = ({ show }) => {
   const [selectedGenre, setSelectedGenre] = useState(null)
-  const result = useQuery(ALL_BOOKS)
+  const result = useQuery(ALL_BOOKS, {
+    variables: { genre: selectedGenre }
+  })
 
   if (!show) {
     return null
@@ -16,11 +20,9 @@ const Books = ({ show }) => {
   }
 
   const books = result.data.allBooks
-  const genres = [...new Set(books.flatMap(book => book.genres))]
-
-  const filteredBooks = selectedGenre
-    ? books.filter((book) => book.genres.includes(selectedGenre))
-    : books
+  if (!selectedGenre) {
+    genres = [...new Set(books.flatMap(book => book.genres))]
+  }
 
   const selectedButtonStyle = {
     borderWidth: '3px',
@@ -43,7 +45,7 @@ const Books = ({ show }) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {filteredBooks.map((book) => (
+          {books.map((book) => (
             <tr key={book.id}>
               <td>{book.title}</td>
               <td>{book.author.name}</td>
