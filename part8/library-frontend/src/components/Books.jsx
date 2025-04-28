@@ -8,7 +8,7 @@ let genres = []
 const Books = ({ show }) => {
   const [selectedGenre, setSelectedGenre] = useState(null)
   const result = useQuery(ALL_BOOKS, {
-    variables: { genre: selectedGenre }
+    variables: selectedGenre ? { genre: selectedGenre } : {},
   })
 
   if (!show) {

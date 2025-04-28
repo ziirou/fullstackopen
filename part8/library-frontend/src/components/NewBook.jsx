@@ -11,10 +11,44 @@ const NewBook = (props) => {
   const [genres, setGenres] = useState([])
 
   const [ addBook ] = useMutation(ADD_BOOK, {
-    refetchQueries: [ { query: ALL_AUTHORS }, { query: ALL_BOOKS } ],
+    refetchQueries: [ { query: ALL_AUTHORS } ],
     onError: (error) => {
-      console.log('Adding book failed:', error)
+      const errors = error.graphQLErrors
+        .map((e) => {
+          const extensionMessage = e.extensions?.error?.message
+          return extensionMessage
+            ? `${e.message}: ${extensionMessage}`
+            : e.message
+        })
+        .join('\n')
+      console.log('Adding book failed:', errors)
     },
+    update: (cache, response) => {
+      const addedBook = response.data.addBook
+
+      // Combine genres of the added book with `null` for the unfiltered query
+      const genresToUpdate = [...addedBook.genres, null]
+
+      // Update the cache for each genre
+      genresToUpdate.forEach((genre) => {
+         // Use {} for the unfiltered query
+        const variables = genre ? { genre } : {}
+        cache.updateQuery(
+          { query: ALL_BOOKS, variables },
+          (data) => {
+            if (!data || !data.allBooks) {
+              // If the cache for this genre doesn't exist, do nothing
+              return undefined
+            }
+
+            // Append the new book to the existing list of books
+            return {
+              allBooks: data.allBooks.concat(addedBook),
+            }
+          }
+        )
+      })
+    }
   })
 
   if (!props.show) {
