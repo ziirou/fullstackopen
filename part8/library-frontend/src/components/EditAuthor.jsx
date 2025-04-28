@@ -34,8 +34,7 @@ const EditAuthor = ({ authors }) => {
 
       <form onSubmit={submit}>
         <label>
-          name:
-          <select
+          name: <select
             value={name}
             onChange={({ target }) => setName(target.value)}
           >
@@ -50,8 +49,7 @@ const EditAuthor = ({ authors }) => {
           </select>
         </label>
         <div>
-          born
-          <input
+          born <input
             type="number"
             value={born}
             onChange={({ target }) => setBorn(Number(target.value))}

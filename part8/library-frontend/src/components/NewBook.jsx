@@ -11,7 +11,10 @@ const NewBook = (props) => {
   const [genres, setGenres] = useState([])
 
   const [ addBook ] = useMutation(ADD_BOOK, {
-    refetchQueries: [ { query: ALL_AUTHORS }, { query: ALL_BOOKS } ]
+    refetchQueries: [ { query: ALL_AUTHORS }, { query: ALL_BOOKS } ],
+    onError: (error) => {
+      console.log('Adding book failed:', error)
+    },
   })
 
   if (!props.show) {
@@ -39,22 +42,19 @@ const NewBook = (props) => {
     <div>
       <form onSubmit={submit}>
         <div>
-          title
-          <input
+          title <input
             value={title}
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
-          author
-          <input
+          author <input
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
-          published
-          <input
+          published <input
             type="number"
             value={published}
             onChange={({ target }) => setPublished(Number(target.value))}
