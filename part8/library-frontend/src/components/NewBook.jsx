@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation } from '@apollo/client'
 import PropTypes from 'prop-types'
+import { updateCache } from '../cacheUtils'
 import { ALL_AUTHORS, ALL_BOOKS, ADD_BOOK } from '../queries'
 
 const NewBook = (props) => {
@@ -24,30 +25,7 @@ const NewBook = (props) => {
       console.log('Adding book failed:', errors)
     },
     update: (cache, response) => {
-      const addedBook = response.data.addBook
-
-      // Combine genres of the added book with `null` for the unfiltered query
-      const genresToUpdate = [...addedBook.genres, null]
-
-      // Update the cache for each genre
-      genresToUpdate.forEach((genre) => {
-         // Use {} for the unfiltered query
-        const variables = genre ? { genre } : {}
-        cache.updateQuery(
-          { query: ALL_BOOKS, variables },
-          (data) => {
-            if (!data || !data.allBooks) {
-              // If the cache for this genre doesn't exist, do nothing
-              return undefined
-            }
-
-            // Append the new book to the existing list of books
-            return {
-              allBooks: data.allBooks.concat(addedBook),
-            }
-          }
-        )
-      })
+      updateCache(cache, { query: ALL_BOOKS }, response.data.addBook)
     }
   })
 
