@@ -38,11 +38,14 @@ const resolvers = {
     },
   },
   Author: {
-    bookCount: async ({ _id }) =>
-      await Book.collection.countDocuments({ author: _id }),
+    bookCount: async ({ _id }, args, { bookCountLoader }) => {
+      return await bookCountLoader.load(_id)
+    },
   },
   Book: {
-    author: async ({ author }) => await Author.findById(author),
+    author: async ({ author }, args, { authorLoader }) => {
+      return await authorLoader.load(author)
+    },
   },
   Mutation: {
     addBook: async (root, args, { currentUser }) => {

@@ -10,16 +10,17 @@ const cors = require('cors')
 const http = require('http')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
-mongoose.set('strictQuery', false)
 
 const User = require('./models/user')
 const typeDefs = require('./schema')
 const resolvers = require('./resolvers')
+const loaders = require('./loaders')
 
 const MONGODB_URI = process.env.MONGODB_URI
 
 console.log('connecting to', MONGODB_URI)
 
+mongoose.set('strictQuery', false)
 mongoose.connect(MONGODB_URI)
   .then(() => {
     console.log('connected to MongoDB')
@@ -65,13 +66,16 @@ const start = async () => {
     expressMiddleware(server, {
       context: async ({ req }) => {
         const auth = req ? req.headers.authorization : null
+        let currentUser = null
+
         if (auth && auth.startsWith('Bearer ')) {
           const decodedToken = jwt.verify(
             auth.substring(7), process.env.JWT_SECRET
           )
-          const currentUser = await User.findById(decodedToken.id)
-          return { currentUser }
+          currentUser = await User.findById(decodedToken.id)
         }
+
+        return { currentUser, ...loaders }
       },
     }),
   )
