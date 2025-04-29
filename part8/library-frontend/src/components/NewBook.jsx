@@ -25,7 +25,7 @@ const NewBook = (props) => {
       console.log('Adding book failed:', errors)
     },
     update: (cache, response) => {
-      updateCache(cache, { query: ALL_BOOKS }, response.data.addBook)
+      updateCache(cache, ALL_BOOKS, response.data.addBook)
     }
   })
 

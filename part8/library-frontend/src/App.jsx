@@ -27,7 +27,7 @@ const App = () => {
     onData: ({ data }) => {
       const addedBook = data.data.bookAdded
       alert(`${addedBook.title} added`)
-      updateCache(client.cache, { query: ALL_BOOKS }, addedBook)
+      updateCache(client.cache, ALL_BOOKS, addedBook)
     }
   })
 
