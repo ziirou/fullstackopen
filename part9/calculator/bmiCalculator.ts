@@ -11,8 +11,8 @@ const parseBmiArguments = (args: string[]): InputValues => {
   const weightKg = Number(args[3]);
 
   if (!isNaN(heightCm) && !isNaN(weightKg)) {
-    if (heightCm < 0 || weightKg < 0) {
-      throw new Error('Provided values were not positive numbers!');
+    if (heightCm <= 0 || weightKg <= 0) {
+      throw new Error('Provided values can\'t be zero or negative numbers!');
     }
 
     return {
@@ -24,7 +24,7 @@ const parseBmiArguments = (args: string[]): InputValues => {
   }
 }
 
-const calculateBmi = (heightCm: number, weightKg: number) : string => {
+export const calculateBmi = (heightCm: number, weightKg: number) : string => {
   //console.log(`Calculating BMI for height: ${heightCm} cm, weight: ${weightKg} kg`);
 
   const heightM = heightCm / 100;
@@ -39,13 +39,15 @@ const calculateBmi = (heightCm: number, weightKg: number) : string => {
   return 'Normal range';
 }
 
-try {
-  const { heightCm, weightKg } = parseBmiArguments(process.argv);
-  console.log(calculateBmi(heightCm, weightKg));
-} catch (error: unknown) {
-  let errorMessage = 'Something bad happened.'
-  if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message;
+if (require.main === module) {
+  try {
+    const { heightCm, weightKg } = parseBmiArguments(process.argv);
+    console.log(calculateBmi(heightCm, weightKg));
+  } catch (error: unknown) {
+    let errorMessage = 'Something bad happened.'
+    if (error instanceof Error) {
+      errorMessage += ' Error: ' + error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }
