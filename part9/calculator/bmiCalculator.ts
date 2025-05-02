@@ -18,11 +18,11 @@ const parseBmiArguments = (args: string[]): InputValues => {
     return {
       heightCm: heightCm,
       weightKg: weightKg
-    }
+    };
   } else {
     throw new Error('Provided values were not numbers!');
   }
-}
+};
 
 export const calculateBmi = (heightCm: number, weightKg: number) : string => {
   //console.log(`Calculating BMI for height: ${heightCm} cm, weight: ${weightKg} kg`);
@@ -37,14 +37,14 @@ export const calculateBmi = (heightCm: number, weightKg: number) : string => {
     return 'Overweight';
   }
   return 'Normal range';
-}
+};
 
 if (require.main === module) {
   try {
     const { heightCm, weightKg } = parseBmiArguments(process.argv);
     console.log(calculateBmi(heightCm, weightKg));
   } catch (error: unknown) {
-    let errorMessage = 'Something bad happened.'
+    let errorMessage = 'Something bad happened.';
     if (error instanceof Error) {
       errorMessage += ' Error: ' + error.message;
     }

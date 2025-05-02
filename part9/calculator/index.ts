@@ -12,7 +12,7 @@ app.get('/bmi', (req, res) => {
   const weightKg = Number(req.query.weight);
 
   if (isNaN(heightCm) || isNaN(weightKg) || heightCm <= 0 || weightKg <= 0) {
-    res.status(400).json({ error: 'malformatted parameters' })
+    res.status(400).json({ error: 'malformatted parameters' });
     return;
   }
 
