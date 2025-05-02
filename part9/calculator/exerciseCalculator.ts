@@ -1,3 +1,8 @@
+interface ExerciseValues {
+  targetHours: number;
+  dailyExerciseHours: number[];
+}
+
 interface Result {
   periodLength: number;
   trainingDays: number;
@@ -8,19 +13,38 @@ interface Result {
   average: number;
 }
 
-const calculateExercises = (dailyExerciseHours: number[]) : Result => {
+const parseArguments = (args: string[]): ExerciseValues => {
+  if (args.length < 4) throw new Error('Not enough arguments');
+
+  const targetHours = Number(args[2]);
+  if (isNaN(targetHours)) {
+    throw new Error('Provided target argument is not number!');
+  } else if (targetHours < 0) {
+    throw new Error('Provided target argument is not positive number!');
+  }
+
+  const dailyHours = args.slice(3).map((hoursArg) => {
+    const hours = Number(hoursArg);
+    if (isNaN(hours)) {
+      throw new Error('Provided hours were not numbers!');
+    } else if (hours < 0) {
+      throw new Error('Provided hours were not positive numbers!');
+    }
+    return hours;
+  });
+
+  return {
+    targetHours: targetHours,
+    dailyExerciseHours: [...dailyHours]
+  }
+}
+
+const calculateExercises = (targetHours: number, dailyExerciseHours: number[]) : Result => {
   const periodLength = dailyExerciseHours.length;
   let trainingDays = 0;
   let totalHours = 0;
-  const targetHours = 2;
 
   dailyExerciseHours.forEach(element => {
-    if (isNaN(element)) {
-      throw new Error('Provided values were not numbers!');
-    } else if (element < 0) {
-      throw new Error('Provided values were not positive numbers!');
-    }
-
     if (element > 0) {
       trainingDays++;
       totalHours += element;
@@ -58,7 +82,8 @@ const calculateExercises = (dailyExerciseHours: number[]) : Result => {
 }
 
 try {
-  console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1]));
+  const { targetHours, dailyExerciseHours } = parseArguments(process.argv);
+  console.log(calculateExercises(targetHours, dailyExerciseHours));
 } catch (error: unknown) {
   let errorMessage = 'Something bad happened.'
   if (error instanceof Error) {
