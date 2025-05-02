@@ -39,7 +39,7 @@ const parseArguments = (args: string[]): ExerciseValues => {
   };
 };
 
-const calculateExercises = (targetHours: number, dailyExerciseHours: number[]) : Result => {
+export const calculateExercises = (targetHours: number, dailyExerciseHours: number[]) : Result => {
   const periodLength = dailyExerciseHours.length;
   let trainingDays = 0;
   let totalHours = 0;
@@ -81,13 +81,15 @@ const calculateExercises = (targetHours: number, dailyExerciseHours: number[]) :
   };
 };
 
-try {
-  const { targetHours, dailyExerciseHours } = parseArguments(process.argv);
-  console.log(calculateExercises(targetHours, dailyExerciseHours));
-} catch (error: unknown) {
-  let errorMessage = 'Something bad happened.';
-  if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message;
+if (require.main === module) {
+  try {
+    const { targetHours, dailyExerciseHours } = parseArguments(process.argv);
+    console.log(calculateExercises(targetHours, dailyExerciseHours));
+  } catch (error: unknown) {
+    let errorMessage = 'Something bad happened.';
+    if (error instanceof Error) {
+      errorMessage += ' Error: ' + error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
 }

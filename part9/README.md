@@ -1,3 +1,3 @@
-# Exercises 9.1-9.6
+# Exercises 9.1-9.7
 
 The answers for the exercises of part 9
