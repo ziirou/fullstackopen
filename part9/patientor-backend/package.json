@@ -5,11 +5,11 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "tsc": "tsc",
-    "start": "node build/index.js",
-    "dev": "ts-node-dev index.ts",
+    "start": "node build/src/index.js",
+    "dev": "ts-node-dev src/index.ts",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
