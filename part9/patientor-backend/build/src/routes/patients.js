@@ -4,26 +4,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const zod_1 = require("zod");
 const patientService_1 = __importDefault(require("../services/patientService"));
-const utils_1 = __importDefault(require("../utils"));
+const utils_1 = require("../utils");
 const router = express_1.default.Router();
 router.get('/', (_req, res) => {
     console.log('someone fetched patients');
     res.send(patientService_1.default.getNonSensitivePatients());
 });
-router.post('/', (req, res) => {
+const errorMiddleware = (error, _req, res, next) => {
+    if (error instanceof zod_1.z.ZodError) {
+        res.status(400).send({ error: error.issues });
+    }
+    else {
+        next(error);
+    }
+};
+const newPatientParser = (req, _res, next) => {
     try {
-        const newPatient = (0, utils_1.default)(req.body);
-        const addedPatient = patientService_1.default.addPatient(newPatient);
-        console.log('someone added new patient:', addedPatient);
-        res.json(addedPatient);
+        utils_1.NewPatientSchema.parse(req.body);
+        next();
     }
     catch (error) {
-        let errorMessage = 'Something went wrong.';
-        if (error instanceof Error) {
-            errorMessage += ' Error: ' + error.message;
-        }
-        res.status(400).send(errorMessage);
+        next(error);
     }
+};
+router.post('/', newPatientParser, (req, res) => {
+    const addedPatient = patientService_1.default.addPatient(req.body);
+    console.log('someone added new patient:', addedPatient);
+    res.json(addedPatient);
 });
+router.use(errorMiddleware);
 exports.default = router;
