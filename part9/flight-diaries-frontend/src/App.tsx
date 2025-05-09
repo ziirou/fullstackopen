@@ -8,6 +8,7 @@ function App() {
   const [weather, setWeather] = useState('');
   const [visibility, setVisibility] = useState('');
   const [comment, setComment] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     getAllDiaries().then(data => {
@@ -21,17 +22,25 @@ function App() {
     createDiary({ date, weather, visibility, comment })
       .then(data => {
         setDiaries(diaries.concat(data));
-      });
 
-    setDate('');
-    setWeather('');
-    setVisibility('');
-    setComment('');
+        setDate('');
+        setWeather('');
+        setVisibility('');
+        setComment('');
+      })
+      .catch(errorMessage => {
+        console.log(errorMessage);
+        setError(errorMessage);
+        setTimeout(() => {
+          setError('')
+        }, 5000);
+      });
   };
 
   return (
     <div>
       <h3>Add new entry</h3>
+      {error && <p style={{ color: 'red' }}>{error}</p>} 
       <form onSubmit={diaryCreation}>
         <div>
           date <input
