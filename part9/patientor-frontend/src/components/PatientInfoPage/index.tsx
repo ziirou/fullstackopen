@@ -8,6 +8,8 @@ import { Patient, Gender, Entry, Diagnosis } from "../../types";
 
 import patientService from "../../services/patients";
 
+import EntryDetails from "./EntryDetails";
+
 const genderIcon = (gender: Gender | undefined ) => {
   switch(gender) {
     case "female":
@@ -20,7 +22,7 @@ const genderIcon = (gender: Gender | undefined ) => {
 };
 
 interface Props {
-  diagnoses : Diagnosis[]
+  diagnoses: Diagnosis[];
 }
 
 const PatientInfoPage = ({ diagnoses } : Props ) => {
@@ -70,25 +72,6 @@ const PatientInfoPage = ({ diagnoses } : Props ) => {
     );
   }
 
-  const renderDiagnoses = (diagnosisCodes: string[] | undefined) => {
-    if (!diagnosisCodes || diagnosisCodes.length === 0) {
-      return null;
-    }
-
-    return (
-      <ul>
-        {diagnosisCodes.map((code: string) => {
-          const diagnosis = diagnoses.find((d) => d.code === code);
-          return (
-            <li key={code}>
-              {code} {diagnosis ? `- ${diagnosis.name}` : ""}
-            </li>
-          );
-        })}
-      </ul>
-    );
-  };
-
   const renderEntries = () => {
     if (!patient.entries || patient.entries.length === 0) {
       return null;
@@ -101,8 +84,7 @@ const PatientInfoPage = ({ diagnoses } : Props ) => {
         </Typography>
         {Object.values(patient.entries).map((entry: Entry) => (
           <div key={entry.id}>
-            {entry.date} - <em>{entry.description}</em>
-            {renderDiagnoses(entry.diagnosisCodes)}
+            <EntryDetails entry={entry} diagnoses={diagnoses} />
           </div>
         ))}
       </>
