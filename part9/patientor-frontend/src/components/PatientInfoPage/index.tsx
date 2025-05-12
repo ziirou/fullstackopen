@@ -4,7 +4,7 @@ import { Typography, CircularProgress } from "@mui/material";
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 
-import { Patient, Gender, Entry } from "../../types";
+import { Patient, Gender, Entry, Diagnosis } from "../../types";
 
 import patientService from "../../services/patients";
 
@@ -19,7 +19,11 @@ const genderIcon = (gender: Gender | undefined ) => {
   }
 };
 
-const PatientInfoPage = () => {
+interface Props {
+  diagnoses : Diagnosis[]
+}
+
+const PatientInfoPage = ({ diagnoses } : Props ) => {
   const [patient, setPatient] = useState<Patient>();
   const [loading, setLoading] = useState(true);
 
@@ -66,6 +70,45 @@ const PatientInfoPage = () => {
     );
   }
 
+  const renderDiagnoses = (diagnosisCodes: string[] | undefined) => {
+    if (!diagnosisCodes || diagnosisCodes.length === 0) {
+      return null;
+    }
+
+    return (
+      <ul>
+        {diagnosisCodes.map((code: string) => {
+          const diagnosis = diagnoses.find((d) => d.code === code);
+          return (
+            <li key={code}>
+              {code} {diagnosis ? `- ${diagnosis.name}` : ""}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
+  const renderEntries = () => {
+    if (!patient.entries || patient.entries.length === 0) {
+      return null;
+    }
+
+    return (
+      <>
+        <Typography variant="h6" gutterBottom={true} marginTop={2}>
+          <b>entries</b>
+        </Typography>
+        {Object.values(patient.entries).map((entry: Entry) => (
+          <div key={entry.id}>
+            {entry.date} - <em>{entry.description}</em>
+            {renderDiagnoses(entry.diagnosisCodes)}
+          </div>
+        ))}
+      </>
+    );
+  };
+
   return (
     <div>
       <Typography variant="h5" gutterBottom={true} marginTop={2}>
@@ -74,27 +117,7 @@ const PatientInfoPage = () => {
       <span>ssn: {patient?.ssn}</span><br />
       <span>occupation: {patient?.occupation}</span>
 
-      {patient.entries && patient.entries.length > 0 && (
-        <>
-          <Typography variant="h6" gutterBottom={true} marginTop={2}>
-            <b>entries</b>
-          </Typography>
-          {Object.values(patient.entries).map((entry: Entry) => (
-            <div key={entry.id}>
-              {entry.date} - <em>{entry.description}</em>
-              {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 && (
-                <ul>
-                  {entry.diagnosisCodes.map((code: string) => (
-                    <li key={code}>
-                      {code}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </>
-      )}
+      {renderEntries()}
     </div>
   );
 };
