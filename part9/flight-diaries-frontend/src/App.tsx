@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
-import type { Diary } from './types';
+import type { Diary, Weather, Visibility } from './types';
+import { weatherOptions, visibilityOptions } from './types';
 import { getAllDiaries, createDiary } from './services/diaryService';
 
 function App() {
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
   const [diaries, setDiaries] = useState<Diary[]>([]);
-  const [date, setDate] = useState('');
-  const [weather, setWeather] = useState('');
-  const [visibility, setVisibility] = useState('');
+  const [date, setDate] = useState(getCurrentDate());
+  const [weather, setWeather] = useState<Weather>(weatherOptions[0]);
+  const [visibility, setVisibility] = useState<Visibility>(visibilityOptions[0]);
   const [comment, setComment] = useState('');
   const [error, setError] = useState('');
 
@@ -23,9 +29,9 @@ function App() {
       .then(data => {
         setDiaries(diaries.concat(data));
 
-        setDate('');
-        setWeather('');
-        setVisibility('');
+        setDate(getCurrentDate());
+        setWeather(weatherOptions[0]);
+        setVisibility(visibilityOptions[0]);
         setComment('');
       })
       .catch(errorMessage => {
@@ -43,25 +49,47 @@ function App() {
       {error && <p style={{ color: 'red' }}>{error}</p>} 
       <form onSubmit={diaryCreation}>
         <div>
-          date <input
+          <label>date: </label>
+          <input
+            type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)} 
           />
         </div>
         <div>
-          weather <input
-            value={weather}
-            onChange={(event) => setWeather(event.target.value)} 
-          />
+          <label>weather: </label>
+          {weatherOptions.map(option => (
+            <label key={option}>
+              <input
+                type="radio"
+                name="weather"
+                value={option}
+                checked={weather === option}
+                onChange={(event) => setWeather(event.target.value as Weather)}
+              />
+              {option}
+            </label>
+          ))}
         </div>
         <div>
-          visibility <input
-            value={visibility}
-            onChange={(event) => setVisibility(event.target.value)} 
-          />
+          <label>visibility: </label>
+          {visibilityOptions.map(option => (
+            <label key={option}>
+              <input
+                type="radio"
+                name="visibility"
+                value={option}
+                checked={visibility === option}
+                onChange={(event) => setVisibility(event.target.value as Visibility)}
+              />
+              {option}
+            </label>
+          ))}
         </div>
         <div>
-          comment <input
+          <label>comment: </label>
+          <input
+            type="text"
             value={comment}
             onChange={(event) => setComment(event.target.value)} 
           />
