@@ -4,9 +4,20 @@ import { Typography, CircularProgress } from "@mui/material";
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 
-import { Patient, Gender } from "../../types";
+import { Patient, Gender, Entry } from "../../types";
 
 import patientService from "../../services/patients";
+
+const genderIcon = (gender: Gender | undefined ) => {
+  switch(gender) {
+    case "female":
+      return <FemaleIcon />;
+    case "male":
+      return <MaleIcon />;
+    default:
+      return null;
+  }
+};
 
 const PatientInfoPage = () => {
   const [patient, setPatient] = useState<Patient>();
@@ -55,17 +66,6 @@ const PatientInfoPage = () => {
     );
   }
 
-  const genderIcon = (gender: Gender | undefined ) => {
-    switch(gender) {
-      case "female":
-        return <FemaleIcon />;
-      case "male":
-        return <MaleIcon />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <div>
       <Typography variant="h5" gutterBottom={true} marginTop={2}>
@@ -73,6 +73,28 @@ const PatientInfoPage = () => {
       </Typography>
       <span>ssn: {patient?.ssn}</span><br />
       <span>occupation: {patient?.occupation}</span>
+
+      {patient.entries && patient.entries.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom={true} marginTop={2}>
+            <b>entries</b>
+          </Typography>
+          {Object.values(patient.entries).map((entry: Entry) => (
+            <div key={entry.id}>
+              {entry.date} - <em>{entry.description}</em>
+              {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 && (
+                <ul>
+                  {entry.diagnosisCodes.map((code: string) => (
+                    <li key={code}>
+                      {code}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 };
