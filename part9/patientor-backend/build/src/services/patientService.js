@@ -15,7 +15,7 @@ const findPatientById = (id) => {
     return patientData_1.default.find(p => p.id === id);
 };
 const addPatient = (patient) => {
-    const newPatient = Object.assign({ id: (0, uuid_1.v1)() }, patient);
+    const newPatient = Object.assign(Object.assign({ id: (0, uuid_1.v1)() }, patient), { entries: patient.entries });
     patientData_1.default.push(newPatient);
     return newPatient;
 };
