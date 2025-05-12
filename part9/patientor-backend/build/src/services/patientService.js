@@ -11,9 +11,12 @@ const getPatients = () => {
 const getNonSensitivePatients = () => {
     return patientData_1.default.map(({ id, name, dateOfBirth, gender, occupation }) => ({ id, name, dateOfBirth, gender, occupation, }));
 };
+const findPatientById = (id) => {
+    return patientData_1.default.find(p => p.id === id);
+};
 const addPatient = (patient) => {
     const newPatient = Object.assign({ id: (0, uuid_1.v1)() }, patient);
     patientData_1.default.push(newPatient);
     return newPatient;
 };
-exports.default = { getPatients, getNonSensitivePatients, addPatient };
+exports.default = { getPatients, getNonSensitivePatients, findPatientById, addPatient };

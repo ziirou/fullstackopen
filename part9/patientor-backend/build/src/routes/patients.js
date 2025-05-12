@@ -12,6 +12,16 @@ router.get('/', (_req, res) => {
     console.log('someone fetched patients');
     res.send(patientService_1.default.getNonSensitivePatients());
 });
+router.get('/:id', (req, res) => {
+    console.log('someone fetched patient with id:', req.params.id);
+    const patient = patientService_1.default.findPatientById(req.params.id);
+    if (patient) {
+        res.send(patient);
+    }
+    else {
+        res.sendStatus(404);
+    }
+});
 const errorMiddleware = (error, _req, res, next) => {
     if (error instanceof zod_1.z.ZodError) {
         res.status(400).send({ error: error.issues });

@@ -11,6 +11,17 @@ router.get('/', (_req, res) => {
   res.send(patientService.getNonSensitivePatients());
 });
 
+router.get('/:id', (req, res) => {
+  console.log('someone fetched patient with id:', req.params.id);
+  const patient = patientService.findPatientById(req.params.id);
+
+  if (patient) {
+    res.send(patient);
+  } else {
+    res.sendStatus(404);
+  }
+});
+
 const errorMiddleware = (
   error: unknown, _req: Request, res: Response, next: NextFunction
 ) => { 
