@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import patientService from '../services/patientService';
-import { NewPatientSchema } from '../utils';
-import { Patient, NewPatient } from '../types';
+import { NewEntrySchema, NewPatientSchema } from '../utils';
+import { Patient, NewPatient, Entry, EntryWithoutId } from '../types';
 
 const router = express.Router();
 
@@ -47,6 +47,31 @@ router.post('/', newPatientParser, (
   const addedPatient = patientService.addPatient(req.body);
   console.log('someone added new patient:', addedPatient);
   res.json(addedPatient);
+});
+
+const newEntryParser = (req: Request, _res: Response, next: NextFunction) => { 
+  try {
+    NewEntrySchema.parse(req.body);
+    next();
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+router.post('/:id/entries', newEntryParser, (
+  req: Request<{ id: string }, unknown, EntryWithoutId>, res: Response<Entry>
+) => {
+  const patientId = req.params.id;
+  console.log('someone adding entry for id:', patientId);
+
+  const patient = patientService.findPatientById(patientId);
+  if (!patient) {
+    res.sendStatus(404);
+  } else {
+    const addedEntry = patientService.addEntry(patient, req.body);
+    console.log('someone added new entry:', addedEntry);
+    res.json(addedEntry);
+  }
 });
 
 router.use(errorMiddleware);

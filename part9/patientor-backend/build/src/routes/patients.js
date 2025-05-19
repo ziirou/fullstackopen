@@ -44,5 +44,27 @@ router.post('/', newPatientParser, (req, res) => {
     console.log('someone added new patient:', addedPatient);
     res.json(addedPatient);
 });
+const newEntryParser = (req, _res, next) => {
+    try {
+        utils_1.NewEntrySchema.parse(req.body);
+        next();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+router.post('/:id/entries', newEntryParser, (req, res) => {
+    const patientId = req.params.id;
+    console.log('someone adding entry for id:', patientId);
+    const patient = patientService_1.default.findPatientById(patientId);
+    if (!patient) {
+        res.sendStatus(404);
+    }
+    else {
+        const addedEntry = patientService_1.default.addEntry(patient, req.body);
+        console.log('someone added new entry:', addedEntry);
+        res.json(addedEntry);
+    }
+});
 router.use(errorMiddleware);
 exports.default = router;
