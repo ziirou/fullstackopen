@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useMatch } from "react-router-dom";
-import { Typography, CircularProgress } from "@mui/material";
+import axios from 'axios';
+import { Typography, CircularProgress, Button } from "@mui/material";
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 
-import { Patient, Gender, Entry, Diagnosis } from "../../types";
+import { Patient, Gender, Entry, Diagnosis, EntryFormValues } from "../../types";
+import AddEntryModal from "../AddEntryModal";
 
 import patientService from "../../services/patients";
 
@@ -28,6 +30,8 @@ interface Props {
 const PatientInfoPage = ({ diagnoses } : Props ) => {
   const [patient, setPatient] = useState<Patient>();
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
 
   const patientMatch = useMatch('/patients/:id');
 
@@ -72,6 +76,44 @@ const PatientInfoPage = ({ diagnoses } : Props ) => {
     );
   }
 
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    try {
+      const entry = await patientService.createEntry(patient.id, values);
+      setPatient({
+        ...patient,
+        entries: patient.entries.concat(entry)
+      });
+      setModalOpen(false);
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        if (e?.response?.data?.error[0]) {
+          let errorMessage = "";
+          if (e?.response?.data?.error[0].path[0] && typeof e?.response?.data?.error[0].path[0] === "string") {
+            errorMessage = e.response.data.error[0].path[0];
+          }
+          if (e?.response?.data?.error[0].message && typeof e?.response?.data?.error[0].message === "string") {
+            errorMessage = errorMessage + ": " + e.response.data.error[0].message;
+          }
+          console.error(errorMessage);
+          setError(errorMessage);
+        } else {
+          console.error("Unrecognized axios error", e);
+          setError("Unrecognized axios error");
+        }
+      } else {
+        console.error("Unknown error", e);
+        setError("Unknown error");
+      }
+    }
+  };
+
   const renderEntries = () => {
     if (!patient.entries || patient.entries.length === 0) {
       return null;
@@ -100,6 +142,16 @@ const PatientInfoPage = ({ diagnoses } : Props ) => {
       <span>occupation: {patient?.occupation}</span>
 
       {renderEntries()}
+
+      <AddEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
+      <Button variant="contained" onClick={() => openModal()}>
+        Add New Entry
+      </Button>
     </div>
   );
 };
