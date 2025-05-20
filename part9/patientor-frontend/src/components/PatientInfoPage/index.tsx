@@ -90,7 +90,7 @@ const PatientInfoPage = ({ diagnoses } : Props ) => {
         ...patient,
         entries: patient.entries.concat(entry)
       });
-      setModalOpen(false);
+      closeModal();
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
         if (e?.response?.data?.error[0]) {
@@ -144,6 +144,7 @@ const PatientInfoPage = ({ diagnoses } : Props ) => {
       {renderEntries()}
 
       <AddEntryModal
+        diagnoses={diagnoses}
         modalOpen={modalOpen}
         onSubmit={submitNewEntry}
         error={error}
