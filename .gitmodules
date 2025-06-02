@@ -2,3 +2,8 @@
 	path = part10/rate-repository-app
 	url = https://github.com/ziirou/rate-repository-app
 	branch = main
+
+[submodule "part11/full-stack-open-pokedex"]
+	path = part11/full-stack-open-pokedex
+	url = https://github.com/ziirou/full-stack-open-pokedex
+	branch = main
