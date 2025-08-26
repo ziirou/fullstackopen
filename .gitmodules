@@ -7,3 +7,8 @@
 	path = part11/full-stack-open-pokedex
 	url = https://github.com/ziirou/full-stack-open-pokedex
 	branch = main
+
+[submodule "part11/phonebook"]
+	path = part11/phonebook
+	url = https://github.com/ziirou/part11-phonebook
+	branch = main
