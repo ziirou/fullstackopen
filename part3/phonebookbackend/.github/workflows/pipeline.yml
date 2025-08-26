@@ -1,0 +1,114 @@
+name: Phonebook Backend - Deployment pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  deployment_pipeline:
+    runs-on: ubuntu-22.04
+    outputs:
+      skip: ${{ steps.check_skip.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: Install dependencies for backend
+        run: npm install
+      - name: Linting for backend
+        run: npm run lint
+      - name: Install dependencies for frontend
+        run: cd frontend_app && npm install
+      - name: Linting for frontend
+        run: cd frontend_app && npm run lint
+      - name: Build frontend
+        run: npm run build:ui
+      - name: Check skip
+        id: check_skip
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(join(github.event.commits.*.message, ' '), '#skip') }}
+        run: echo "skip=true" >> $GITHUB_OUTPUT
+      - name: Trigger deployment
+        if: ${{ steps.check_skip.outputs.skip != 'true' }}
+        run: curl https://api.render.com/deploy/srv-${{ secrets.PHONEBOOK_RENDER_SERVICE_ID }}?key=${{ secrets.PHONEBOOK_RENDER_API_KEY }}
+      - name: Set notification title and label
+        id: notif_title
+        if: always()
+        run: |
+          if [ -n "${{ github.event.head_commit.message }}" ]; then
+            echo "label=Commit Title" >> $GITHUB_OUTPUT
+            echo "title=$(echo "${{ github.event.head_commit.message }}" | head -n1)" >> $GITHUB_OUTPUT
+          elif [ -n "${{ github.event.pull_request.title }}" ]; then
+            echo "label=Pull Request Title" >> $GITHUB_OUTPUT
+            echo "title=$(echo "${{ github.event.pull_request.title }}" | head -n1)" >> $GITHUB_OUTPUT
+          else
+            echo "label=Title" >> $GITHUB_OUTPUT
+            echo "title=No title available" >> $GITHUB_OUTPUT
+          fi
+      - name: Discord Notify Deployed
+        uses: rjstone/discord-webhook-notify@v2
+        if: ${{ success() && steps.check_skip.outputs.skip != 'true' }}
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          details: |
+            All tests passed - a new version deployed!
+            Commit : [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            By : ${{ github.actor }}
+            ${{ steps.notif_title.outputs.label }}: ${{ steps.notif_title.outputs.title }}
+      - name: Discord Notify Deployment Skipped
+        uses: rjstone/discord-webhook-notify@v2
+        if: ${{ success() && steps.check_skip.outputs.skip == 'true' }}
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          details: |
+            All tests passed - deployment skipped!
+            Commit : [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            By : ${{ github.actor }}
+            ${{ steps.notif_title.outputs.label }}: ${{ steps.notif_title.outputs.title }}
+      - name: Discord Notify Error
+        uses: rjstone/discord-webhook-notify@v2
+        if: ${{ failure() }}
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: error
+          details: |
+            Build failed!
+            Commit : [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
+            By : ${{ github.actor }}
+            ${{ steps.notif_title.outputs.label }}: ${{ steps.notif_title.outputs.title }}
+  tag_release:
+    if: ${{ needs.deployment_pipeline.outputs.skip != 'true' }}
+    needs: [deployment_pipeline]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@4ed44965e0db8dab2b466a16da04aec3cc312fd8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_PREFIX: v
+          DEFAULT_BUMP: patch
+      - name: Get latest tag
+        id: get_tag
+        run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+      - name: Discord Notify Tag Release
+        uses: rjstone/discord-webhook-notify@v2
+        if: ${{ success() }}
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          severity: info
+          details: |
+            A new tag released: [${{ steps.get_tag.outputs.tag }}](https://github.com/${{ github.repository }}/releases/tag/${{ steps.get_tag.outputs.tag }})
