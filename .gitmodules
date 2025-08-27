@@ -12,3 +12,8 @@
 	path = part11/phonebook
 	url = https://github.com/ziirou/part11-phonebook
 	branch = main
+
+[submodule "part12/part12-containers-applications"]
+	path = part12/part12-containers-applications
+	url = https://github.com/ziirou/part12-containers-applications
+	branch = main
