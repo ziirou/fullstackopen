@@ -1,3 +1,3 @@
-# Exercises 12.x-12.x
+# Exercises 12.1-12.1
 
 The answers for the exercises of part 12
